@@ -31,7 +31,7 @@ interface StudentViewProps {
   onUpdateProfile: (profile: StudentProfile) => void;
 }
 
-type StudentTab = 'home' | 'orders' | 'history' | 'cart' | 'profile' | 'settings';
+type StudentTab = 'home' | 'orders' | 'history' | 'cart' | 'profile' | 'settings' | 'search';
 type CheckoutStep = 'basket' | 'billing' | 'payment';
 
 const CancellationTimer = ({ createdAt }: { createdAt: string }) => {
@@ -513,27 +513,32 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
 
   return (
     <div className="min-h-screen bg-[#F8FAF9] dark:bg-slate-950 text-gray-900 dark:text-slate-100 font-sans pb-32 transition-colors duration-300">
-      {/* Upper header */}
-      <header className="sticky top-0 bg-white/85 dark:bg-slate-900/85 backdrop-blur-xl border-b border-gray-100 dark:border-slate-800 px-6 py-4 flex justify-between items-center z-40 transition-colors duration-300">
+      {/* Upper header - Compact margins */}
+      <header className="sticky top-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-b border-gray-100 dark:border-slate-800 px-5 py-2.5 flex justify-between items-center z-40 transition-colors duration-300">
         <div className="flex items-center gap-3">
-          <div 
-            onClick={() => setIsCameraOpen(true)}
-            className="w-11 h-11 bg-emerald-600 rounded-2xl flex items-center justify-center text-white font-black shadow-lg shadow-emerald-100/50 cursor-pointer overflow-hidden group relative transition-transform hover:scale-105"
-            title="Click to take camera photo"
-          >
-            {studentProfile?.photo_url ? (
-              <img src={studentProfile.photo_url} alt="Profile" className="w-full h-full object-cover" />
-            ) : (
-              studentProfile?.full_name?.[0] || 'U'
-            )}
-            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-              <Camera className="w-4 h-4 text-white" />
+          {activeTab !== 'home' ? (
+            <button 
+              onClick={() => navigateTo('home')}
+              className="flex items-center gap-1.5 text-slate-800 dark:text-white font-black hover:text-emerald-600 transition-colors py-1.5 px-3 -ml-2 rounded-2xl bg-slate-100/80 dark:bg-slate-800/80 hover:bg-slate-200"
+              title="Go back to Home"
+            >
+              <ChevronLeft className="w-5 h-5 text-emerald-600 stroke-[3px]" />
+              <span className="text-xs uppercase tracking-wider font-extrabold">Back to Home</span>
+            </button>
+          ) : (
+            <div 
+              onClick={() => navigateTo('profile')}
+              className="cursor-pointer group flex items-center gap-2"
+              title="Click to view/edit profile"
+            >
+              <div>
+                <p className="text-[9px] font-black text-gray-400 dark:text-slate-400 uppercase tracking-widest leading-none">Hello, Welcome!</p>
+                <h2 className="text-sm font-black text-gray-950 dark:text-white mt-0.5 tracking-tight group-hover:text-emerald-600 transition-colors flex items-center gap-1.5">
+                  {studentProfile?.full_name || 'Guest Student'}
+                </h2>
+              </div>
             </div>
-          </div>
-          <div>
-            <p className="text-[9px] font-black text-gray-400 dark:text-slate-400 uppercase tracking-widest leading-none">Hello, Welcome!</p>
-            <h2 className="text-sm font-black text-gray-950 dark:text-white mt-1 tracking-tight">{studentProfile?.full_name || 'Guest Student'}</h2>
-          </div>
+          )}
         </div>
 
         <div className="flex items-center gap-2">
@@ -556,202 +561,223 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
             onMarkAsRead={markAsRead}
           />
 
-          {/* Settings Modal Button */}
+          {/* Profile Icon Button */}
           <button 
-            onClick={() => setIsSettingsOpen(true)}
-            className="w-10 h-10 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl flex items-center justify-center transition-colors border border-slate-100 dark:border-slate-800"
-            title="App Settings"
+            onClick={() => navigateTo('profile')}
+            className="w-9 h-9 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl flex items-center justify-center transition-colors border border-slate-100 dark:border-slate-800"
+            title="Student Profile"
           >
-            <Settings className="w-4 h-4" />
-          </button>
-
-          {/* Shopping Cart Button */}
-          <button 
-            onClick={() => navigateTo('cart')}
-            className="w-10 h-10 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-gray-800 dark:text-slate-200 rounded-xl flex items-center justify-center relative transition-colors border border-slate-100 dark:border-slate-800"
-            title="View Cart"
-          >
-            <ShoppingCart className="w-4 h-4" />
-            {cart.length > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white font-black text-[9px] w-5 h-5 rounded-full flex items-center justify-center border-2 border-white dark:border-slate-900 animate-bounce">
-                {cart.length}
-              </span>
-            )}
+            <UserIcon className="w-4 h-4" />
           </button>
         </div>
       </header>
 
       {/* Main Tab Renderers */}
       <main className="max-w-2xl mx-auto">
-        {activeTab === 'home' && (
-          <div className="space-y-6 animate-in fade-in duration-500">
-            {/* Elegant Brand Welcome banner */}
-            <div className="px-6 mt-4">
-              <div className="bg-emerald-600 rounded-[2.5rem] p-6 text-white relative overflow-hidden shadow-xl shadow-emerald-100">
-                <div className="absolute top-[-40px] right-[-40px] w-32 h-32 bg-white/10 rounded-full blur-2xl" />
-                <div className="relative z-10 max-w-[65%]">
-                  <span className="bg-yellow-400 text-slate-950 font-black text-[8px] px-2.5 py-1 rounded-full uppercase tracking-widest leading-none">Campus Cafe</span>
-                  <h3 className="text-xl font-black tracking-tight mt-3 leading-tight text-white">Preorder Meals, Bypass the Queue</h3>
-                  <p className="text-[10px] text-emerald-100 mt-2 font-medium leading-relaxed opacity-90">Instant digital reservation for Hostel blocks.</p>
+        {/* DEDICATED FULL SEARCH PAGE VIEW */}
+        {activeTab === 'search' && (
+          <div className="px-5 pt-3 space-y-5 animate-in fade-in duration-300 pb-24">
+            {/* Top Navigation Row */}
+            <div className="flex items-center justify-between">
+              <button 
+                onClick={() => navigateTo('home')}
+                className="flex items-center gap-1.5 text-slate-800 dark:text-white font-black hover:text-emerald-600 transition-colors py-2 px-3.5 -ml-2 rounded-2xl bg-slate-100 dark:bg-slate-800"
+              >
+                <ChevronLeft className="w-5 h-5 text-emerald-600 stroke-[3px]" />
+                <span className="text-xs uppercase tracking-wider font-extrabold">Back to Home</span>
+              </button>
+              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Search Food</span>
+            </div>
+
+            {/* Integrated Search Bar with Right-Side Veg Switch Pill */}
+            <div className="relative flex items-center bg-[#cbd5e1]/40 dark:bg-slate-800/90 rounded-full border border-slate-200/80 dark:border-slate-700/80 shadow-inner px-4 py-1.5 transition-all focus-within:ring-2 focus-within:ring-emerald-500">
+              <Search className="w-4.5 h-4.5 text-gray-500 dark:text-slate-400 shrink-0 mr-2.5" />
+              <input 
+                type="text" 
+                placeholder="Search pizza, sandwich, meals..." 
+                className="w-full bg-transparent border-none outline-none font-bold text-xs text-slate-800 dark:text-slate-100 placeholder:text-gray-500 dark:placeholder:text-slate-400 py-2.5"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                autoFocus
+              />
+              {searchTerm && (
+                <button 
+                  onClick={() => setSearchTerm('')}
+                  className="p-1 text-gray-400 hover:text-gray-600 mr-2"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+
+              {/* Integrated Visual Veg/Non-Veg Toggle Switch on Right Side */}
+              <button
+                type="button"
+                onClick={() => {
+                  const next = dietaryFilter === 'veg' ? 'all' : 'veg';
+                  setDietaryFilter(next);
+                  localStorage.setItem('hb_veg_preference', next);
+                }}
+                className="flex items-center gap-1.5 shrink-0 pl-2 focus:outline-none cursor-pointer border-l border-slate-300 dark:border-slate-700"
+                title={dietaryFilter === 'veg' ? 'Veg Mode Active (Click to show all)' : 'Switch to Veg Mode'}
+              >
+                <span className="text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-200 hidden sm:inline">
+                  {dietaryFilter === 'veg' ? '🌱 Veg' : 'Veg'}
+                </span>
+                <div className={`w-12 h-6.5 rounded-full p-0.5 transition-colors duration-300 flex items-center shadow-inner ${
+                  dietaryFilter === 'veg' ? 'bg-emerald-500 justify-end' : 'bg-amber-300 dark:bg-slate-700 justify-start'
+                }`}>
+                  <div className="w-5.5 h-5.5 rounded-full bg-amber-400 dark:bg-amber-300 shadow-md flex items-center justify-center text-[9px] font-bold">
+                    {dietaryFilter === 'veg' ? '🌱' : ''}
+                  </div>
                 </div>
-                <div className="absolute right-6 bottom-4 w-28 h-28 opacity-15">
-                  <Utensils className="w-full h-full text-white" />
-                </div>
+              </button>
+            </div>
+
+            {/* Quick Popular Searches Tags */}
+            <div className="space-y-2">
+              <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Popular Searches</span>
+              <div className="flex flex-wrap gap-2">
+                {['Pizza 🍕', 'Sandwich 🥪', 'Cold Coffee ☕', 'Veg Thali 🍱', 'Burger 🍔', 'Dosa 🥞', 'Fries 🍟'].map(tag => (
+                  <button
+                    key={tag}
+                    onClick={() => setSearchTerm(tag.split(' ')[0])}
+                    className="px-3.5 py-1.5 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-[10px] font-extrabold text-slate-700 dark:text-slate-200 hover:border-emerald-500 hover:text-emerald-600 transition-colors shadow-sm"
+                  >
+                    {tag}
+                  </button>
+                ))}
               </div>
             </div>
 
-            {/* Premium search bar with filter button */}
-            <div className="px-6 space-y-3">
-              <div className="relative flex items-center gap-3">
-                <div className="relative flex-1">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-gray-300 dark:text-slate-500 focus-within:text-emerald-600 transition-colors" />
-                  <input 
-                    type="text" 
-                    placeholder="Search pizza, sandwich, meals..." 
-                    className="w-full pl-12 pr-5 py-4 bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-3xl outline-none font-bold text-xs focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 shadow-sm transition-all text-slate-800 dark:text-slate-100 placeholder:text-gray-400 dark:placeholder:text-slate-500"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                </div>
-                <button 
-                  onClick={() => setShowFilterBar(!showFilterBar)}
-                  className={`w-12 h-12 rounded-2xl border flex items-center justify-center transition-all ${
-                    showFilterBar || dietaryFilter !== 'all' || maxPrice < 300 || sortBy !== 'recommended'
-                      ? 'bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-200' 
-                      : 'bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-300 border-gray-100 dark:border-slate-800 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800'
-                  }`}
-                  title="Filter & Sort"
-                >
-                  <ListFilter className="w-5 h-5" />
-                </button>
+            {/* Live Search Results */}
+            <section className="space-y-3 pt-2">
+              <div className="flex justify-between items-center">
+                <h3 className="text-xs font-black text-slate-400 dark:text-slate-400 uppercase tracking-widest">
+                  {searchTerm ? `Search Results for "${searchTerm}"` : 'All Food Items'}
+                </h3>
+                <span className="text-[10px] font-bold text-slate-500">{filteredMenu.length} items found</span>
               </div>
 
-              {/* Advanced Filter Drawer */}
-              {showFilterBar && (
-                <div className="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm space-y-4 animate-in slide-in-from-top-2 duration-300">
-                  <div className="flex justify-between items-center pb-2 border-b border-gray-50 dark:border-slate-800">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-1.5">
-                      <Filter className="w-3.5 h-3.5 text-emerald-600" /> Filter & Sort Options
-                    </span>
-                    <button 
-                      onClick={() => {
-                        setDietaryFilter('all');
-                        setMaxPrice(300);
-                        setSortBy('recommended');
-                      }}
-                      className="text-[9px] font-black text-emerald-600 dark:text-emerald-400 hover:underline uppercase tracking-wider"
-                    >
-                      Reset All
-                    </button>
-                  </div>
-
-                  {/* Dietary Toggle */}
-                  <div className="space-y-2">
-                    <label className="text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 block">Dietary Preference</label>
-                    <div className="grid grid-cols-3 gap-2">
-                      {[
-                        { id: 'all', label: 'All Items' },
-                        { id: 'veg', label: '🌱 Veg Only' },
-                        { id: 'non-veg', label: '🍖 Non-Veg' }
-                      ].map(d => (
-                        <button
-                          key={d.id}
-                          onClick={() => setDietaryFilter(d.id as any)}
-                          className={`py-2 px-3 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all ${
-                            dietaryFilter === d.id
-                              ? 'bg-slate-900 dark:bg-emerald-600 text-white shadow-sm'
-                              : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
-                          }`}
-                        >
-                          {d.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Price Slider */}
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center text-[9px] font-black uppercase tracking-widest">
-                      <span className="text-slate-500 dark:text-slate-400">Max Price Limit</span>
-                      <span className="text-emerald-600 dark:text-emerald-400 font-extrabold text-xs">₹{maxPrice}</span>
-                    </div>
-                    <input 
-                      type="range"
-                      min="20"
-                      max="300"
-                      step="10"
-                      value={maxPrice}
-                      onChange={(e) => setMaxPrice(Number(e.target.value))}
-                      className="w-full accent-emerald-600 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer"
-                    />
-                  </div>
-
-                  {/* Sort By Dropdown */}
-                  <div className="space-y-2">
-                    <label className="text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 block">Sort By</label>
-                    <div className="grid grid-cols-3 gap-2">
-                      {[
-                        { id: 'recommended', label: 'Popular' },
-                        { id: 'price-low', label: 'Price: Low-High' },
-                        { id: 'price-high', label: 'Price: High-Low' }
-                      ].map(s => (
-                        <button
-                          key={s.id}
-                          onClick={() => setSortBy(s.id as any)}
-                          className={`py-2 px-2 rounded-xl text-[9px] font-black uppercase tracking-wider text-center transition-all ${
-                            sortBy === s.id
-                              ? 'bg-emerald-600 text-white shadow-sm'
-                              : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
-                          }`}
-                        >
-                          {s.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+              {filteredMenu.length === 0 ? (
+                <div className="py-16 text-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl flex flex-col items-center justify-center gap-3">
+                  <Utensils className="w-10 h-10 text-slate-300 dark:text-slate-600" />
+                  <p className="text-xs font-black text-slate-600 dark:text-slate-300 uppercase tracking-wider">No food items found matching "{searchTerm}"</p>
+                  <button 
+                    onClick={() => setSearchTerm('')} 
+                    className="text-xs font-black text-emerald-600 hover:underline uppercase"
+                  >
+                    Clear Search
+                  </button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-3.5">
+                  {filteredMenu.map(item => {
+                    const inCart = cart.find(i => i.menu_item_id === item.id);
+                    const qty = inCart ? inCart.quantity : 0;
+                    return (
+                      <div 
+                        key={item.id} 
+                        onClick={() => handleOpenMealDetail(item)}
+                        className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-[2rem] p-3 hover:shadow-md transition-all cursor-pointer relative flex flex-col justify-between group"
+                      >
+                        <div>
+                          <div className="w-full h-32 rounded-2xl overflow-hidden bg-amber-50 dark:bg-slate-800 relative">
+                            <img 
+                              src={item.imageUrl} 
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                              referrerPolicy="no-referrer" 
+                            />
+                            <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-md flex items-center justify-center text-[10px]">
+                              {item.is_veg !== false ? '🌱' : '🥩'}
+                            </div>
+                          </div>
+                          <h4 className="text-xs font-black text-slate-900 dark:text-white mt-2.5 line-clamp-1">{item.item_name}</h4>
+                          <p className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold line-clamp-1 mt-0.5">{item.description}</p>
+                        </div>
+                        <div className="flex items-center justify-between mt-3 pt-2 border-t border-slate-100 dark:border-slate-800">
+                          <span className="text-xs font-black text-emerald-600 dark:text-emerald-400">₹{item.price}</span>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleCartItem(item, 1);
+                            }}
+                            className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase transition-all ${
+                              qty > 0 
+                                ? 'bg-amber-500 text-white' 
+                                : 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 hover:bg-emerald-600 hover:text-white'
+                            }`}
+                          >
+                            {qty > 0 ? `Added (${qty})` : '+ Add'}
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
+            </section>
+          </div>
+        )}
+
+        {/* HOME TAB VIEW */}
+        {activeTab === 'home' && (
+          <div className="space-y-4 pt-1 animate-in fade-in duration-500">
+            {/* Search bar with integrated Veg/Non-Veg Visual Switch Pill on Right */}
+            <div className="px-5">
+              <div 
+                onClick={() => navigateTo('search')}
+                className="relative flex items-center bg-[#cbd5e1]/40 dark:bg-slate-800/80 rounded-full border border-gray-200/80 dark:border-slate-700/80 shadow-inner px-4 py-1.5 transition-all focus-within:ring-2 focus-within:ring-emerald-500 cursor-pointer"
+              >
+                <Search className="w-4 h-4 text-gray-500 dark:text-slate-400 shrink-0 mr-2.5" />
+                <input 
+                  type="text" 
+                  placeholder="Search pizza, sandwich, meals..." 
+                  className="w-full bg-transparent border-none outline-none font-bold text-xs text-slate-800 dark:text-slate-100 placeholder:text-gray-500 dark:placeholder:text-slate-400 py-2 cursor-pointer"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onClick={() => navigateTo('search')}
+                  onFocus={() => navigateTo('search')}
+                  readOnly
+                />
+
+                {/* Integrated Right-Side Veg Switch Toggle inside search container */}
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const next = dietaryFilter === 'veg' ? 'all' : 'veg';
+                    setDietaryFilter(next);
+                    localStorage.setItem('hb_veg_preference', next);
+                  }}
+                  className="flex items-center gap-1.5 shrink-0 pl-2 focus:outline-none cursor-pointer border-l border-slate-300 dark:border-slate-700"
+                  title={dietaryFilter === 'veg' ? 'Veg Mode Active (Click to show all)' : 'Switch to Veg Mode'}
+                >
+                  <span className="text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-200 hidden sm:inline">
+                    {dietaryFilter === 'veg' ? '🌱 Veg' : 'Veg'}
+                  </span>
+                  <div className={`w-12 h-6.5 rounded-full p-0.5 transition-colors duration-300 flex items-center shadow-inner ${
+                    dietaryFilter === 'veg' ? 'bg-emerald-500 justify-end' : 'bg-amber-300 dark:bg-slate-700 justify-start'
+                  }`}>
+                    <div className="w-5.5 h-5.5 rounded-full bg-amber-400 dark:bg-amber-300 shadow-md flex items-center justify-center text-[9px] font-bold">
+                      {dietaryFilter === 'veg' ? '🌱' : ''}
+                    </div>
+                  </div>
+                </button>
+              </div>
             </div>
 
-            {/* Category horizontal bar & Quick Veg/Non-Veg Filter */}
-            <section className="space-y-3">
-              <div className="px-6 flex justify-between items-center">
-                <h3 className="text-xs font-black text-slate-400 dark:text-slate-400 uppercase tracking-widest">Categories</h3>
-                {/* Quick Veg / Non-Veg Pills */}
-                <div className="flex items-center gap-1.5 bg-amber-50/80 dark:bg-slate-900 p-1 rounded-2xl border border-amber-200/50 dark:border-slate-800">
-                  <button
-                    onClick={() => setDietaryFilter('all')}
-                    className={`px-2.5 py-1 rounded-xl text-[9px] font-black uppercase tracking-wider transition-all ${
-                      dietaryFilter === 'all' ? 'bg-amber-500 text-white shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:text-slate-900'
-                    }`}
-                  >
-                    All
-                  </button>
-                  <button
-                    onClick={() => setDietaryFilter('veg')}
-                    className={`px-2.5 py-1 rounded-xl text-[9px] font-black uppercase tracking-wider transition-all ${
-                      dietaryFilter === 'veg' ? 'bg-emerald-600 text-white shadow-sm' : 'text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100/50'
-                    }`}
-                  >
-                    🌱 Veg
-                  </button>
-                  <button
-                    onClick={() => setDietaryFilter('non-veg')}
-                    className={`px-2.5 py-1 rounded-xl text-[9px] font-black uppercase tracking-wider transition-all ${
-                      dietaryFilter === 'non-veg' ? 'bg-red-600 text-white shadow-sm' : 'text-red-700 dark:text-red-400 hover:bg-red-100/50'
-                    }`}
-                  >
-                    🍖 Non-Veg
-                  </button>
-                </div>
+            {/* Category horizontal bar - FIRST below search bar */}
+            <section className="space-y-2">
+              <div className="px-5 flex justify-between items-center">
+                <h3 className="text-[11px] font-black text-slate-400 dark:text-slate-400 uppercase tracking-widest">Categories</h3>
               </div>
 
-              <div className="flex gap-2.5 overflow-x-auto px-6 pb-2 no-scrollbar scroll-smooth">
+              <div className="flex gap-2.5 overflow-x-auto px-5 pb-1 no-scrollbar scroll-smooth">
                 {categories.map(cat => (
                   <button
                     key={cat}
                     onClick={() => setSelectedCategory(cat)}
-                    className={`px-6 py-2.5 rounded-full text-xs font-black uppercase tracking-wider whitespace-nowrap transition-all ${
+                    className={`px-5 py-2 rounded-full text-xs font-black uppercase tracking-wider whitespace-nowrap transition-all ${
                       selectedCategory === cat 
                         ? 'bg-amber-100/90 dark:bg-amber-950 text-amber-950 dark:text-amber-200 border-2 border-amber-400 shadow-sm' 
                         : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-amber-100 dark:border-slate-800 hover:bg-amber-50/50 dark:hover:bg-slate-800'
@@ -762,6 +788,21 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
                 ))}
               </div>
             </section>
+
+            {/* Campus Cafe Promo banner - PLACED BELOW CATEGORIES */}
+            <div className="px-5">
+              <div className="bg-emerald-600 rounded-[2.2rem] p-5 text-white relative overflow-hidden shadow-xl shadow-emerald-100/80">
+                <div className="absolute top-[-40px] right-[-40px] w-32 h-32 bg-white/10 rounded-full blur-2xl" />
+                <div className="relative z-10 max-w-[65%]">
+                  <span className="bg-yellow-400 text-slate-950 font-black text-[8px] px-2.5 py-1 rounded-full uppercase tracking-widest leading-none">Campus Cafe</span>
+                  <h3 className="text-lg font-black tracking-tight mt-2.5 leading-tight text-white">Preorder Meals, Bypass the Queue</h3>
+                  <p className="text-[10px] text-emerald-100 mt-1.5 font-medium leading-relaxed opacity-90">Instant digital reservation for Hostel blocks.</p>
+                </div>
+                <div className="absolute right-5 bottom-3 w-24 h-24 opacity-15">
+                  <Utensils className="w-full h-full text-white" />
+                </div>
+              </div>
+            </div>
 
             {/* Today's Selection Menu Grid - Styled like reference mockup */}
             <section className="px-6 space-y-4 pb-20">
@@ -871,8 +912,8 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
           <div className="px-6 pt-4 space-y-6 animate-in slide-in-from-right-4 duration-500">
             <div className="flex justify-between items-center">
               <div>
-                <h3 className="text-xl font-black text-gray-950 tracking-tight">Active Tickets</h3>
-                <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1">Live order progress</p>
+                <h3 className="text-xl font-black text-gray-950 dark:text-white tracking-tight">Active Tickets</h3>
+                <p className="text-[9px] text-gray-400 dark:text-slate-400 font-bold uppercase tracking-widest mt-0.5">Live order progress</p>
               </div>
               <Bell className="w-5 h-5 text-gray-400 animate-bounce" />
             </div>
@@ -958,8 +999,8 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
           <div className="px-6 pt-4 space-y-6 animate-in slide-in-from-right-4 duration-500 pb-12">
             <div className="flex justify-between items-center">
               <div>
-                <h3 className="text-xl font-black text-gray-950 tracking-tight">Order History</h3>
-                <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1">Your past meals & records</p>
+                <h3 className="text-xl font-black text-gray-950 dark:text-white tracking-tight">Order History</h3>
+                <p className="text-[9px] text-gray-400 dark:text-slate-400 font-bold uppercase tracking-widest mt-0.5">Your past meals & records</p>
               </div>
               <Clock className="w-5 h-5 text-gray-400" />
             </div>
@@ -1041,8 +1082,8 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
               <div className="space-y-6 animate-in slide-in-from-bottom-4">
                 <div className="flex justify-between items-end">
                   <div>
-                    <h3 className="text-xl font-black text-gray-950 tracking-tight">Your Cart</h3>
-                    <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1">Review selected meals</p>
+                    <h3 className="text-xl font-black text-gray-950 dark:text-white tracking-tight">Your Cart</h3>
+                    <p className="text-[9px] text-gray-400 dark:text-slate-400 font-bold uppercase tracking-widest mt-0.5">Review selected meals</p>
                   </div>
                   {cart.length > 0 && (
                     <button 
@@ -1440,7 +1481,7 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
         {/* PROFILE SCREEN VIEW */}
         {activeTab === 'profile' && (
           <div className="px-6 pt-4 space-y-6 animate-in fade-in duration-500 pb-12">
-             <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm flex flex-col items-center">
+             <div className="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-gray-100 dark:border-slate-800 shadow-sm flex flex-col items-center">
                 <div className="w-20 h-20 bg-emerald-600 rounded-[1.8rem] flex items-center justify-center text-white text-3xl font-black shadow-lg shadow-emerald-200/50 mb-4">
                   {studentProfile?.full_name?.[0] || 'U'}
                 </div>
@@ -1675,10 +1716,9 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
         <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-gray-100 dark:border-slate-800 px-4 py-3 flex justify-around items-center z-40 max-w-2xl rounded-t-[2.5rem] shadow-[0_-8px_30px_rgba(0,0,0,0.03)] transition-colors duration-300">
           {[
             { tab: 'home', icon: <Home className="w-5 h-5" />, label: 'Home' },
-            { tab: 'orders', icon: <Utensils className="w-5 h-5" />, label: 'Tickets' },
+            { tab: 'orders', icon: <Utensils className="w-5 h-5" />, label: 'Order' },
             { tab: 'cart', icon: <ShoppingCart className="w-5 h-5" />, label: 'Cart' },
-            { tab: 'settings', icon: <Settings className="w-5 h-5" />, label: 'Settings' },
-            { tab: 'profile', icon: <UserIcon className="w-5 h-5" />, label: 'Profile' }
+            { tab: 'settings', icon: <Settings className="w-5 h-5" />, label: 'Settings' }
           ].map((item) => {
             const isActive = activeTab === item.tab;
             return (

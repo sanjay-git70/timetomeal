@@ -51,7 +51,11 @@ export const CameraCaptureModal: React.FC<CameraCaptureModalProps> = ({
       }
     } catch (err: any) {
       console.error('Camera access error:', err);
-      setCameraError(err?.message || 'Unable to access device camera. Please grant camera permissions or upload an image.');
+      let message = err?.message || 'Unable to access device camera.';
+      if (err?.name === 'NotAllowedError' || message.toLowerCase().includes('permission') || message.toLowerCase().includes('dismissed') || message.toLowerCase().includes('denied')) {
+        message = 'Camera permission was dismissed or blocked. You can retry camera access or upload a photo directly from your device.';
+      }
+      setCameraError(message);
     } finally {
       setIsInitializing(false);
     }
@@ -164,13 +168,22 @@ export const CameraCaptureModal: React.FC<CameraCaptureModalProps> = ({
               className="w-full h-full object-cover"
             />
           ) : cameraError ? (
-            <div className="p-6 text-center text-white flex flex-col items-center gap-3">
-              <AlertCircle className="w-12 h-12 text-amber-400" />
-              <p className="text-xs font-bold text-gray-300 leading-relaxed">{cameraError}</p>
-              <label className="mt-2 px-5 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest cursor-pointer shadow-lg shadow-emerald-900/50 transition-all flex items-center gap-2">
-                <Upload className="w-4 h-4" /> Upload Photo File
-                <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
-              </label>
+            <div className="p-6 text-center text-white flex flex-col items-center justify-center gap-3 h-full">
+              <AlertCircle className="w-10 h-10 text-amber-400 shrink-0" />
+              <p className="text-xs font-semibold text-gray-300 leading-relaxed max-w-xs">{cameraError}</p>
+              <div className="flex flex-wrap items-center justify-center gap-2.5 mt-2">
+                <button
+                  type="button"
+                  onClick={startCamera}
+                  className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-[10px] font-black uppercase tracking-wider transition-all flex items-center gap-2 border border-slate-700 shadow-md"
+                >
+                  <RefreshCw className="w-3.5 h-3.5 text-emerald-400" /> Retry Camera
+                </button>
+                <label className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-[10px] font-black uppercase tracking-wider cursor-pointer shadow-lg shadow-emerald-900/50 transition-all flex items-center gap-2">
+                  <Upload className="w-3.5 h-3.5" /> Select Photo
+                  <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
+                </label>
+              </div>
             </div>
           ) : (
             <>
@@ -220,21 +233,39 @@ export const CameraCaptureModal: React.FC<CameraCaptureModalProps> = ({
             </div>
           ) : (
             <div className="flex flex-col gap-2.5">
-              <button
-                type="button"
-                disabled={!!cameraError || isInitializing}
-                onClick={takeSnapshot}
-                className="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-2xl text-xs font-black uppercase tracking-[0.15em] shadow-xl shadow-emerald-200 transition-all flex items-center justify-center gap-2.5 active:scale-95 disabled:opacity-50"
-              >
-                <Camera className="w-5 h-5" /> Take Snap
-              </button>
+              {cameraError ? (
+                <div className="grid grid-cols-2 gap-2.5">
+                  <button
+                    type="button"
+                    onClick={startCamera}
+                    className="py-3.5 bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold rounded-2xl text-[10px] uppercase tracking-wider transition-all flex items-center justify-center gap-2"
+                  >
+                    <RefreshCw className="w-4 h-4 text-emerald-600" /> Retry Camera
+                  </button>
+                  <label className="py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-2xl text-[10px] uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-emerald-200">
+                    <Upload className="w-4 h-4" /> Upload Photo
+                    <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
+                  </label>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  disabled={isInitializing}
+                  onClick={takeSnapshot}
+                  className="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-2xl text-xs font-black uppercase tracking-[0.15em] shadow-xl shadow-emerald-200 transition-all flex items-center justify-center gap-2.5 active:scale-95 disabled:opacity-50"
+                >
+                  <Camera className="w-5 h-5" /> Take Snap
+                </button>
+              )}
 
-              <div className="flex items-center justify-between pt-2">
-                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest hover:text-emerald-600 cursor-pointer flex items-center gap-1.5 transition-all">
-                  <Upload className="w-3.5 h-3.5" /> Upload from Device Gallery
-                  <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
-                </label>
-              </div>
+              {!cameraError && (
+                <div className="flex items-center justify-center pt-1">
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest hover:text-emerald-600 cursor-pointer flex items-center gap-1.5 transition-all">
+                    <Upload className="w-3.5 h-3.5" /> Upload from Device Gallery
+                    <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
+                  </label>
+                </div>
+              )}
             </div>
           )}
         </div>
