@@ -39,6 +39,7 @@ const StaffView: React.FC<StaffViewProps> = ({ user, orders, menu, onUpdateOrder
     price: 0,
     category: 'breakfast',
     availability: true,
+    is_veg: true,
     stock_offline: 100,
     stock_online: 50,
     imageUrl: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=400'
@@ -97,7 +98,7 @@ const StaffView: React.FC<StaffViewProps> = ({ user, orders, menu, onUpdateOrder
     } as MenuItem;
     onUpdateMenu([...menu, createdItem]);
     setIsAddingItem(false);
-    setNewItem({ item_name: '', price: 0, category: 'breakfast', availability: true, stock_offline: 100, stock_online: 50, imageUrl: newItem.imageUrl, description: '' });
+    setNewItem({ item_name: '', price: 0, category: 'breakfast', availability: true, is_veg: true, stock_offline: 100, stock_online: 50, imageUrl: newItem.imageUrl, description: '' });
   };
 
   const filteredOrders = useMemo(() => {
@@ -351,17 +352,23 @@ const StaffView: React.FC<StaffViewProps> = ({ user, orders, menu, onUpdateOrder
                              <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2">Or Choose a Preset Dish Image:</p>
                              <div className="flex flex-wrap gap-2">
                                {[
-                                 { name: '🍳 Breakfast', url: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&q=80&w=400' },
-                                 { name: '🍱 Thali/Lunch', url: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&q=80&w=400' },
-                                 { name: '🥪 Sandwich', url: 'https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&q=80&w=400' },
-                                 { name: '🥤 Cold Coffee', url: 'https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?auto=format&fit=crop&q=80&w=400' },
-                                 { name: '🍜 Noodles', url: 'https://images.unsplash.com/photo-1585032226651-759b368d7246?auto=format&fit=crop&q=80&w=400' },
-                                 { name: '🥟 Snacks', url: 'https://images.unsplash.com/photo-1601050690597-df056fb4ce78?auto=format&fit=crop&q=80&w=400' }
+                                 { name: '🍗 Chicken Biryani', url: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&q=80&w=400', isVeg: false },
+                                 { name: '🍚 Chicken Fried Rice', url: 'https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&q=80&w=400', isVeg: false },
+                                 { name: '🥣 Curd Rice', url: 'https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&q=80&w=400', isVeg: true },
+                                 { name: '🍅 Tomato Rice', url: 'https://images.unsplash.com/photo-1596797038530-2c107229654b?auto=format&fit=crop&q=80&w=400', isVeg: true },
+                                 { name: '🥪 Chicken Sandwich', url: 'https://images.unsplash.com/photo-1521305916504-4a1121188589?auto=format&fit=crop&q=80&w=400', isVeg: false },
+                                 { name: '🍗 Chicken Nuggets', url: 'https://images.unsplash.com/photo-1562967914-608f82629710?auto=format&fit=crop&q=80&w=400', isVeg: false },
+                                 { name: '🔥 Chicken Wings', url: 'https://images.unsplash.com/photo-1567620832903-9fc6debc209f?auto=format&fit=crop&q=80&w=400', isVeg: false },
+                                 { name: '🥪 Veg Sandwich', url: 'https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&q=80&w=400', isVeg: true },
+                                 { name: '🍳 Breakfast', url: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&q=80&w=400', isVeg: true },
+                                 { name: '🍱 Thali/Lunch', url: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&q=80&w=400', isVeg: true },
+                                 { name: '🥤 Cold Coffee', url: 'https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?auto=format&fit=crop&q=80&w=400', isVeg: true },
+                                 { name: '🥟 Snacks', url: 'https://images.unsplash.com/photo-1601050690597-df056fb4ce78?auto=format&fit=crop&q=80&w=400', isVeg: true }
                                ].map((preset, idx) => (
                                  <button
                                    key={idx}
                                    type="button"
-                                   onClick={() => setNewItem({ ...newItem, imageUrl: preset.url })}
+                                   onClick={() => setNewItem({ ...newItem, imageUrl: preset.url, is_veg: preset.isVeg })}
                                    className={`px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-wider transition-all border ${
                                      newItem.imageUrl === preset.url
                                        ? 'bg-emerald-600 border-emerald-600 text-white shadow-md shadow-emerald-100'
@@ -374,14 +381,21 @@ const StaffView: React.FC<StaffViewProps> = ({ user, orders, menu, onUpdateOrder
                              </div>
                            </div>
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-3 gap-4">
                            <div className="space-y-2">
                               <label className="text-[11px] font-black text-gray-400 uppercase ml-2 tracking-widest">Pricing (₹)</label>
                               <input required type="number" value={newItem.price} onChange={e => setNewItem({...newItem, price: Number(e.target.value)})} className="w-full px-6 py-4 bg-gray-50 rounded-[1.5rem] outline-none font-bold text-gray-950 border-2 border-transparent focus:border-emerald-500 transition-all shadow-inner" />
                            </div>
                            <div className="space-y-2">
+                              <label className="text-[11px] font-black text-gray-400 uppercase ml-2 tracking-widest">Dietary Type</label>
+                              <select value={newItem.is_veg ? 'veg' : 'non-veg'} onChange={e => setNewItem({...newItem, is_veg: e.target.value === 'veg'})} className="w-full px-4 py-4 bg-gray-50 rounded-[1.5rem] outline-none font-bold text-gray-950 border-2 border-transparent focus:border-emerald-500 transition-all shadow-inner appearance-none">
+                                 <option value="veg">🌱 Veg</option>
+                                 <option value="non-veg">🍖 Non-Veg</option>
+                              </select>
+                           </div>
+                           <div className="space-y-2">
                               <label className="text-[11px] font-black text-gray-400 uppercase ml-2 tracking-widest">Classification</label>
-                              <select value={newItem.category} onChange={e => setNewItem({...newItem, category: e.target.value as any})} className="w-full px-6 py-4 bg-gray-50 rounded-[1.5rem] outline-none font-bold text-gray-950 border-2 border-transparent focus:border-emerald-500 transition-all shadow-inner appearance-none">
+                              <select value={newItem.category} onChange={e => setNewItem({...newItem, category: e.target.value as any})} className="w-full px-4 py-4 bg-gray-50 rounded-[1.5rem] outline-none font-bold text-gray-950 border-2 border-transparent focus:border-emerald-500 transition-all shadow-inner appearance-none">
                                  <option value="breakfast">Breakfast</option>
                                  <option value="lunch">Lunch</option>
                                  <option value="snacks">Snacks</option>

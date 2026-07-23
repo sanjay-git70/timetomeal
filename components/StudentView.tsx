@@ -31,7 +31,7 @@ interface StudentViewProps {
   onUpdateProfile: (profile: StudentProfile) => void;
 }
 
-type StudentTab = 'home' | 'orders' | 'history' | 'cart' | 'profile';
+type StudentTab = 'home' | 'orders' | 'history' | 'cart' | 'profile' | 'settings';
 type CheckoutStep = 'basket' | 'billing' | 'payment';
 
 const CancellationTimer = ({ createdAt }: { createdAt: string }) => {
@@ -76,7 +76,9 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
   // Filtering & Sorting State
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [dietaryFilter, setDietaryFilter] = useState<'all' | 'veg' | 'non-veg'>('all');
+  const [dietaryFilter, setDietaryFilter] = useState<'all' | 'veg' | 'non-veg'>(() => {
+    return (localStorage.getItem('hb_veg_preference') as any) || 'all';
+  });
   const [maxPrice, setMaxPrice] = useState<number>(300);
   const [sortBy, setSortBy] = useState<'recommended' | 'price-low' | 'price-high'>('recommended');
   const [showFilterBar, setShowFilterBar] = useState(false);
@@ -510,9 +512,9 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAF9] text-gray-900 font-sans pb-32">
+    <div className="min-h-screen bg-[#F8FAF9] dark:bg-slate-950 text-gray-900 dark:text-slate-100 font-sans pb-32 transition-colors duration-300">
       {/* Upper header */}
-      <header className="sticky top-0 bg-white/85 backdrop-blur-xl border-b border-gray-100 px-6 py-4 flex justify-between items-center z-40">
+      <header className="sticky top-0 bg-white/85 dark:bg-slate-900/85 backdrop-blur-xl border-b border-gray-100 dark:border-slate-800 px-6 py-4 flex justify-between items-center z-40 transition-colors duration-300">
         <div className="flex items-center gap-3">
           <div 
             onClick={() => setIsCameraOpen(true)}
@@ -529,8 +531,8 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
             </div>
           </div>
           <div>
-            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none">Hello, Welcome!</p>
-            <h2 className="text-sm font-black text-gray-950 mt-1 tracking-tight">{studentProfile?.full_name || 'Guest Student'}</h2>
+            <p className="text-[9px] font-black text-gray-400 dark:text-slate-400 uppercase tracking-widest leading-none">Hello, Welcome!</p>
+            <h2 className="text-sm font-black text-gray-950 dark:text-white mt-1 tracking-tight">{studentProfile?.full_name || 'Guest Student'}</h2>
           </div>
         </div>
 
@@ -538,7 +540,7 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
           {isProfileIncomplete && (
             <button 
               onClick={() => navigateTo('profile')}
-              className="bg-amber-100 text-amber-800 text-[8px] font-black px-2.5 py-1 rounded-full uppercase tracking-widest border border-amber-200 animate-pulse hidden sm:block"
+              className="bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 text-[8px] font-black px-2.5 py-1 rounded-full uppercase tracking-widest border border-amber-200 dark:border-amber-800 animate-pulse hidden sm:block"
             >
               Complete Profile
             </button>
@@ -557,7 +559,7 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
           {/* Settings Modal Button */}
           <button 
             onClick={() => setIsSettingsOpen(true)}
-            className="w-10 h-10 bg-slate-50 hover:bg-slate-100 text-slate-700 rounded-xl flex items-center justify-center transition-colors border border-slate-100"
+            className="w-10 h-10 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl flex items-center justify-center transition-colors border border-slate-100 dark:border-slate-800"
             title="App Settings"
           >
             <Settings className="w-4 h-4" />
@@ -566,12 +568,12 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
           {/* Shopping Cart Button */}
           <button 
             onClick={() => navigateTo('cart')}
-            className="w-10 h-10 bg-slate-50 hover:bg-slate-100 text-gray-800 rounded-xl flex items-center justify-center relative transition-colors border border-slate-100"
+            className="w-10 h-10 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-gray-800 dark:text-slate-200 rounded-xl flex items-center justify-center relative transition-colors border border-slate-100 dark:border-slate-800"
             title="View Cart"
           >
             <ShoppingCart className="w-4 h-4" />
             {cart.length > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white font-black text-[9px] w-5 h-5 rounded-full flex items-center justify-center border-2 border-white animate-bounce">
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white font-black text-[9px] w-5 h-5 rounded-full flex items-center justify-center border-2 border-white dark:border-slate-900 animate-bounce">
                 {cart.length}
               </span>
             )}
@@ -602,11 +604,11 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
             <div className="px-6 space-y-3">
               <div className="relative flex items-center gap-3">
                 <div className="relative flex-1">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-gray-300 focus-within:text-emerald-600 transition-colors" />
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-gray-300 dark:text-slate-500 focus-within:text-emerald-600 transition-colors" />
                   <input 
                     type="text" 
                     placeholder="Search pizza, sandwich, meals..." 
-                    className="w-full pl-12 pr-5 py-4 bg-white border border-gray-100 rounded-3xl outline-none font-bold text-xs focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 shadow-sm transition-all text-slate-800 placeholder:text-gray-400"
+                    className="w-full pl-12 pr-5 py-4 bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-3xl outline-none font-bold text-xs focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 shadow-sm transition-all text-slate-800 dark:text-slate-100 placeholder:text-gray-400 dark:placeholder:text-slate-500"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
@@ -616,7 +618,7 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
                   className={`w-12 h-12 rounded-2xl border flex items-center justify-center transition-all ${
                     showFilterBar || dietaryFilter !== 'all' || maxPrice < 300 || sortBy !== 'recommended'
                       ? 'bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-200' 
-                      : 'bg-white text-slate-500 border-gray-100 shadow-sm hover:bg-slate-50'
+                      : 'bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-300 border-gray-100 dark:border-slate-800 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800'
                   }`}
                   title="Filter & Sort"
                 >
@@ -626,8 +628,8 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
 
               {/* Advanced Filter Drawer */}
               {showFilterBar && (
-                <div className="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm space-y-4 animate-in slide-in-from-top-2 duration-300">
-                  <div className="flex justify-between items-center pb-2 border-b border-gray-50">
+                <div className="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm space-y-4 animate-in slide-in-from-top-2 duration-300">
+                  <div className="flex justify-between items-center pb-2 border-b border-gray-50 dark:border-slate-800">
                     <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-1.5">
                       <Filter className="w-3.5 h-3.5 text-emerald-600" /> Filter & Sort Options
                     </span>
@@ -637,7 +639,7 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
                         setMaxPrice(300);
                         setSortBy('recommended');
                       }}
-                      className="text-[9px] font-black text-emerald-600 hover:underline uppercase tracking-wider"
+                      className="text-[9px] font-black text-emerald-600 dark:text-emerald-400 hover:underline uppercase tracking-wider"
                     >
                       Reset All
                     </button>
@@ -645,7 +647,7 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
 
                   {/* Dietary Toggle */}
                   <div className="space-y-2">
-                    <label className="text-[9px] font-black uppercase tracking-widest text-slate-500 block">Dietary Preference</label>
+                    <label className="text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 block">Dietary Preference</label>
                     <div className="grid grid-cols-3 gap-2">
                       {[
                         { id: 'all', label: 'All Items' },
@@ -657,8 +659,8 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
                           onClick={() => setDietaryFilter(d.id as any)}
                           className={`py-2 px-3 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all ${
                             dietaryFilter === d.id
-                              ? 'bg-slate-900 text-white shadow-sm'
-                              : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
+                              ? 'bg-slate-900 dark:bg-emerald-600 text-white shadow-sm'
+                              : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
                           }`}
                         >
                           {d.label}
@@ -670,8 +672,8 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
                   {/* Price Slider */}
                   <div className="space-y-2">
                     <div className="flex justify-between items-center text-[9px] font-black uppercase tracking-widest">
-                      <span className="text-slate-500">Max Price Limit</span>
-                      <span className="text-emerald-600 font-extrabold text-xs">₹{maxPrice}</span>
+                      <span className="text-slate-500 dark:text-slate-400">Max Price Limit</span>
+                      <span className="text-emerald-600 dark:text-emerald-400 font-extrabold text-xs">₹{maxPrice}</span>
                     </div>
                     <input 
                       type="range"
@@ -680,13 +682,13 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
                       step="10"
                       value={maxPrice}
                       onChange={(e) => setMaxPrice(Number(e.target.value))}
-                      className="w-full accent-emerald-600 h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer"
+                      className="w-full accent-emerald-600 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer"
                     />
                   </div>
 
                   {/* Sort By Dropdown */}
                   <div className="space-y-2">
-                    <label className="text-[9px] font-black uppercase tracking-widest text-slate-500 block">Sort By</label>
+                    <label className="text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 block">Sort By</label>
                     <div className="grid grid-cols-3 gap-2">
                       {[
                         { id: 'recommended', label: 'Popular' },
@@ -699,7 +701,7 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
                           className={`py-2 px-2 rounded-xl text-[9px] font-black uppercase tracking-wider text-center transition-all ${
                             sortBy === s.id
                               ? 'bg-emerald-600 text-white shadow-sm'
-                              : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
+                              : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
                           }`}
                         >
                           {s.label}
@@ -714,13 +716,13 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
             {/* Category horizontal bar & Quick Veg/Non-Veg Filter */}
             <section className="space-y-3">
               <div className="px-6 flex justify-between items-center">
-                <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest">Categories</h3>
+                <h3 className="text-xs font-black text-slate-400 dark:text-slate-400 uppercase tracking-widest">Categories</h3>
                 {/* Quick Veg / Non-Veg Pills */}
-                <div className="flex items-center gap-1.5 bg-amber-50/80 p-1 rounded-2xl border border-amber-200/50">
+                <div className="flex items-center gap-1.5 bg-amber-50/80 dark:bg-slate-900 p-1 rounded-2xl border border-amber-200/50 dark:border-slate-800">
                   <button
                     onClick={() => setDietaryFilter('all')}
                     className={`px-2.5 py-1 rounded-xl text-[9px] font-black uppercase tracking-wider transition-all ${
-                      dietaryFilter === 'all' ? 'bg-amber-500 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'
+                      dietaryFilter === 'all' ? 'bg-amber-500 text-white shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:text-slate-900'
                     }`}
                   >
                     All
@@ -728,7 +730,7 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
                   <button
                     onClick={() => setDietaryFilter('veg')}
                     className={`px-2.5 py-1 rounded-xl text-[9px] font-black uppercase tracking-wider transition-all ${
-                      dietaryFilter === 'veg' ? 'bg-emerald-600 text-white shadow-sm' : 'text-emerald-700 hover:bg-emerald-100/50'
+                      dietaryFilter === 'veg' ? 'bg-emerald-600 text-white shadow-sm' : 'text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100/50'
                     }`}
                   >
                     🌱 Veg
@@ -736,7 +738,7 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
                   <button
                     onClick={() => setDietaryFilter('non-veg')}
                     className={`px-2.5 py-1 rounded-xl text-[9px] font-black uppercase tracking-wider transition-all ${
-                      dietaryFilter === 'non-veg' ? 'bg-red-600 text-white shadow-sm' : 'text-red-700 hover:bg-red-100/50'
+                      dietaryFilter === 'non-veg' ? 'bg-red-600 text-white shadow-sm' : 'text-red-700 dark:text-red-400 hover:bg-red-100/50'
                     }`}
                   >
                     🍖 Non-Veg
@@ -751,8 +753,8 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
                     onClick={() => setSelectedCategory(cat)}
                     className={`px-6 py-2.5 rounded-full text-xs font-black uppercase tracking-wider whitespace-nowrap transition-all ${
                       selectedCategory === cat 
-                        ? 'bg-amber-100/90 text-amber-950 border-2 border-amber-400 shadow-sm' 
-                        : 'bg-white text-slate-600 border border-amber-100 hover:bg-amber-50/50'
+                        ? 'bg-amber-100/90 dark:bg-amber-950 text-amber-950 dark:text-amber-200 border-2 border-amber-400 shadow-sm' 
+                        : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-amber-100 dark:border-slate-800 hover:bg-amber-50/50 dark:hover:bg-slate-800'
                     }`}
                   >
                     {cat}
@@ -764,14 +766,14 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
             {/* Today's Selection Menu Grid - Styled like reference mockup */}
             <section className="px-6 space-y-4 pb-20">
               <div className="flex justify-between items-center">
-                <h3 className="text-sm font-black text-gray-950 uppercase tracking-widest">Today's Selection</h3>
-                <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">{filteredMenu.length} items available</span>
+                <h3 className="text-sm font-black text-gray-950 dark:text-white uppercase tracking-widest">Today's Selection</h3>
+                <span className="text-[9px] font-black text-gray-400 dark:text-slate-400 uppercase tracking-widest">{filteredMenu.length} items available</span>
               </div>
 
               {filteredMenu.length === 0 ? (
-                <div className="py-16 text-center bg-[#fffbf2] border border-amber-200/50 rounded-[2rem] flex flex-col items-center justify-center gap-3">
-                  <Utensils className="w-10 h-10 text-amber-300" />
-                  <p className="text-[10px] font-black text-amber-800 uppercase tracking-widest">No matching items found</p>
+                <div className="py-16 text-center bg-[#fffbf2] dark:bg-slate-900 border border-amber-200/50 dark:border-slate-800 rounded-[2rem] flex flex-col items-center justify-center gap-3">
+                  <Utensils className="w-10 h-10 text-amber-300 dark:text-slate-600" />
+                  <p className="text-[10px] font-black text-amber-800 dark:text-slate-300 uppercase tracking-widest">No matching items found</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-2 gap-3.5">
@@ -782,17 +784,28 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
                       <div 
                         key={item.id} 
                         onClick={() => handleOpenMealDetail(item)}
-                        className="bg-[#fffdf9] border border-amber-200/60 rounded-[2rem] p-3 hover:shadow-md transition-all cursor-pointer relative flex flex-col justify-between group"
+                        className="bg-[#fffdf9] dark:bg-slate-900 border border-amber-200/60 dark:border-slate-800 rounded-[2rem] p-3 hover:shadow-md transition-all cursor-pointer relative flex flex-col justify-between group"
                       >
                         <div>
                           {/* Image box with top right checkmark badge */}
-                          <div className="w-full h-32 rounded-2xl overflow-hidden bg-amber-50 relative">
+                          <div className="w-full h-32 rounded-2xl overflow-hidden bg-amber-50 dark:bg-slate-800 relative">
                             <img 
                               src={item.imageUrl} 
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
                               referrerPolicy="no-referrer" 
                             />
-                            {/* Checkmark badge when in cart */}
+                            {/* Veg / Non-Veg Badge */}
+                            <div className="absolute top-2.5 left-2.5 z-10">
+                              {item.is_veg === false ? (
+                                <span className="bg-red-600 text-white text-[8px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider shadow-sm border border-red-500/50 flex items-center gap-1">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-white"></span> Non-Veg
+                                </span>
+                              ) : (
+                                <span className="bg-emerald-600 text-white text-[8px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider shadow-sm border border-emerald-500/50 flex items-center gap-1">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-white"></span> Veg
+                                </span>
+                              )}
+                            </div>
                             {qty > 0 && (
                               <div className="absolute top-2.5 right-2.5 w-7 h-7 bg-amber-500 text-white rounded-full flex items-center justify-center shadow-md animate-in zoom-in-50">
                                 <Check className="w-4 h-4 stroke-[3px]" />
@@ -805,13 +818,13 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
 
                           {/* Info */}
                           <div className="mt-3 px-1">
-                            <h4 className="font-black text-xs text-slate-900 group-hover:text-amber-600 transition-colors leading-tight line-clamp-1">{item.item_name}</h4>
+                            <h4 className="font-black text-xs text-slate-900 dark:text-white group-hover:text-amber-600 transition-colors leading-tight line-clamp-1">{item.item_name}</h4>
                           </div>
                         </div>
 
                         {/* Card footer: price & stepper / circular plus button */}
                         <div className="mt-3 px-1 flex items-center justify-between">
-                          <p className="text-sm font-black text-slate-950">₹{item.price}</p>
+                          <p className="text-sm font-black text-slate-950 dark:text-amber-400">₹{item.price}</p>
 
                           {qty > 0 ? (
                             <div 
@@ -865,29 +878,29 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
             </div>
 
             {myActiveOrders.length === 0 ? (
-              <div className="py-20 text-center bg-white border border-gray-100 rounded-[2.5rem] flex flex-col items-center justify-center gap-4">
-                <div className="w-16 h-16 bg-slate-50 text-slate-300 rounded-full flex items-center justify-center">
+              <div className="py-20 text-center bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-[2.5rem] flex flex-col items-center justify-center gap-4">
+                <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800 text-slate-300 dark:text-slate-600 rounded-full flex items-center justify-center">
                   <Clock className="w-8 h-8" />
                 </div>
                 <div>
-                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">No Active Orders</p>
-                  <p className="text-[9px] font-bold text-gray-300 uppercase tracking-widest mt-1">Choose some fresh meals and submit!</p>
+                  <p className="text-[10px] font-black text-gray-400 dark:text-slate-400 uppercase tracking-widest">No Active Orders</p>
+                  <p className="text-[9px] font-bold text-gray-300 dark:text-slate-500 uppercase tracking-widest mt-1">Choose some fresh meals and submit!</p>
                 </div>
               </div>
             ) : (
               <div className="space-y-4">
                 {myActiveOrders.map(order => (
-                  <div key={order.id} className="bg-white rounded-[2rem] border border-gray-100 shadow-sm space-y-4 hover:border-emerald-100 transition-all overflow-hidden p-5">
+                  <div key={order.id} className="bg-white dark:bg-slate-900 rounded-[2rem] border border-gray-100 dark:border-slate-800 shadow-sm space-y-4 hover:border-emerald-100 dark:hover:border-emerald-900 transition-all overflow-hidden p-5">
                     {/* Header bar of ticket */}
                     <div className="flex justify-between items-start">
                       <div className="flex flex-col">
-                        <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest">Token ID</p>
-                        <h4 className="font-black text-2xl text-gray-950 tracking-tighter mt-1">#{order.order_code}</h4>
+                        <p className="text-[8px] font-black text-gray-400 dark:text-slate-400 uppercase tracking-widest">Token ID</p>
+                        <h4 className="font-black text-2xl text-gray-950 dark:text-white tracking-tighter mt-1">#{order.order_code}</h4>
                       </div>
                       <div className="flex flex-col items-end gap-1.5">
                         <span className={`px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-sm ${
                           order.order_status === 'ready' ? 'bg-emerald-600 text-white animate-pulse' : 
-                          order.order_status === 'preparing' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500 border border-slate-200'
+                          order.order_status === 'preparing' ? 'bg-blue-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-300 border border-slate-200 dark:border-slate-700'
                         }`}>{order.order_status}</span>
                         <CancellationTimer createdAt={order.created_at} />
                       </div>
@@ -901,16 +914,16 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
                     />
 
                     {/* Meal details list inside ticket */}
-                    <div className="bg-slate-50/70 p-4 rounded-2xl space-y-2 border border-slate-100">
+                    <div className="bg-slate-50/70 dark:bg-slate-800/70 p-4 rounded-2xl space-y-2 border border-slate-100 dark:border-slate-700">
                       {order.order_items?.map((i, idx) => (
-                        <div key={idx} className="flex justify-between text-xs font-bold text-gray-700">
+                        <div key={idx} className="flex justify-between text-xs font-bold text-gray-700 dark:text-slate-300">
                           <span>{i.quantity}x {i.item_name}</span>
-                          <span className="text-gray-900 font-black">₹{i.price * i.quantity}</span>
+                          <span className="text-gray-900 dark:text-white font-black">₹{i.price * i.quantity}</span>
                         </div>
                       ))}
-                      <div className="h-px bg-slate-200/50 my-2" />
-                      <div className="flex justify-between items-center pt-1 text-slate-900">
-                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Total Bill</span>
+                      <div className="h-px bg-slate-200/50 dark:bg-slate-700 my-2" />
+                      <div className="flex justify-between items-center pt-1 text-slate-900 dark:text-white">
+                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-400">Total Bill</span>
                         <span className="font-black text-lg">₹{order.total_amount}</span>
                       </div>
                     </div>
@@ -919,15 +932,15 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
                     <div className="flex items-center justify-between gap-3 pt-2">
                       <button
                         onClick={() => setSelectedReceiptOrder(order)}
-                        className="bg-slate-100 hover:bg-slate-200 text-slate-800 font-black px-4 py-2.5 rounded-xl transition-all flex items-center gap-1.5 uppercase tracking-widest text-[9px]"
+                        className="bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-black px-4 py-2.5 rounded-xl transition-all flex items-center gap-1.5 uppercase tracking-widest text-[9px]"
                       >
-                        <Printer className="w-3.5 h-3.5 text-slate-600" /> Receipt
+                        <Printer className="w-3.5 h-3.5 text-slate-600 dark:text-slate-400" /> Receipt
                       </button>
 
                       {['pending', 'preparing'].includes(order.order_status) && (
                         <button
                           onClick={() => setCancellingOrderId(order.id)}
-                          className="bg-red-50 hover:bg-red-100 text-red-600 border border-red-100 font-black px-4 py-2.5 rounded-xl transition-all flex items-center gap-1.5 uppercase tracking-widest text-[9px]"
+                          className="bg-red-50 dark:bg-red-950/50 hover:bg-red-100 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 border border-red-100 dark:border-red-900/50 font-black px-4 py-2.5 rounded-xl transition-all flex items-center gap-1.5 uppercase tracking-widest text-[9px]"
                         >
                           <X className="w-3.5 h-3.5" /> Cancel Order
                         </button>
@@ -1508,6 +1521,23 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
                 </div>
              </section>
 
+             {/* Flutter App & Account Settings Entry Tile */}
+             <button 
+               onClick={() => setIsSettingsOpen(true)}
+               className="w-full p-5 bg-gradient-to-r from-emerald-600 to-teal-700 text-white rounded-[2rem] shadow-lg shadow-emerald-500/20 flex items-center justify-between transition-all hover:scale-[1.01] active:scale-[0.99]"
+             >
+               <div className="flex items-center gap-3.5">
+                 <div className="p-3 bg-white/20 backdrop-blur-md rounded-2xl text-white">
+                   <Settings className="w-5 h-5" />
+                 </div>
+                 <div className="text-left">
+                   <p className="text-sm font-black tracking-tight">App & Account Settings</p>
+                   <p className="text-[10px] font-bold text-emerald-100 uppercase tracking-wider">Veg Mode, Theme, Payment Methods & Notifications</p>
+                 </div>
+               </div>
+               <ArrowRight className="w-5 h-5 text-white" />
+             </button>
+
              {/* Logout button */}
              <button 
                onClick={onLogout}
@@ -1544,7 +1574,14 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
             <div className="p-8 space-y-6">
               <div className="flex justify-between items-start gap-4">
                 <div>
-                  <h3 className="text-xl font-black text-slate-900 leading-tight">{selectedMeal.item_name}</h3>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-xl font-black text-slate-900 leading-tight">{selectedMeal.item_name}</h3>
+                    {selectedMeal.is_veg === false ? (
+                      <span className="bg-red-600 text-white text-[8px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider shrink-0">Non-Veg</span>
+                    ) : (
+                      <span className="bg-emerald-600 text-white text-[8px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider shrink-0">Veg</span>
+                    )}
+                  </div>
                   <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mt-1">Available Fresh • Block A</p>
                 </div>
                 <p className="text-2xl font-black text-slate-950 leading-none">₹{selectedMeal.price}</p>
@@ -1633,40 +1670,42 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
         </div>
       )}
 
-      {/* STUNNING ANIMATED BOTTOM NAVIGATION BAR */}
-      <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full bg-white/95 backdrop-blur-md border-t border-gray-100 px-4 py-3 flex justify-around items-center z-40 max-w-2xl rounded-t-[2.5rem] shadow-[0_-8px_30px_rgba(0,0,0,0.03)]">
-        {[
-          { tab: 'home', icon: <Home className="w-5 h-5" />, label: 'Home' },
-          { tab: 'orders', icon: <Utensils className="w-5 h-5" />, label: 'Tickets' },
-          { tab: 'history', icon: <Clock className="w-5 h-5" />, label: 'History' },
-          { tab: 'cart', icon: <ShoppingCart className="w-5 h-5" />, label: 'Cart' },
-          { tab: 'profile', icon: <UserIcon className="w-5 h-5" />, label: 'Profile' }
-        ].map((item) => {
-          const isActive = activeTab === item.tab;
-          return (
-            <button
-              key={item.tab}
-              onClick={() => navigateTo(item.tab as StudentTab)}
-              className="flex flex-col items-center gap-1 relative focus:outline-none group py-1.5 px-3"
-            >
-              {/* Highlight background pill */}
-              {isActive && (
-                <div className="absolute inset-0 bg-emerald-50 rounded-2xl scale-110 -z-10 animate-in fade-in zoom-in-90 duration-300" />
-              )}
-              <div className={`transition-transform duration-300 group-hover:scale-110 ${
-                isActive ? 'text-emerald-600 scale-110' : 'text-slate-400'
-              }`}>
-                {item.icon}
-              </div>
-              <span className={`text-[8px] font-black uppercase tracking-widest mt-1 transition-all ${
-                isActive ? 'text-emerald-700 opacity-100' : 'text-slate-400 opacity-80'
-              }`}>
-                {item.label}
-              </span>
-            </button>
-          );
-        })}
-      </nav>
+      {/* STUNNING ANIMATED BOTTOM NAVIGATION BAR (Hidden on Settings page) */}
+      {activeTab !== 'settings' && !isSettingsOpen && (
+        <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-gray-100 dark:border-slate-800 px-4 py-3 flex justify-around items-center z-40 max-w-2xl rounded-t-[2.5rem] shadow-[0_-8px_30px_rgba(0,0,0,0.03)] transition-colors duration-300">
+          {[
+            { tab: 'home', icon: <Home className="w-5 h-5" />, label: 'Home' },
+            { tab: 'orders', icon: <Utensils className="w-5 h-5" />, label: 'Tickets' },
+            { tab: 'cart', icon: <ShoppingCart className="w-5 h-5" />, label: 'Cart' },
+            { tab: 'settings', icon: <Settings className="w-5 h-5" />, label: 'Settings' },
+            { tab: 'profile', icon: <UserIcon className="w-5 h-5" />, label: 'Profile' }
+          ].map((item) => {
+            const isActive = activeTab === item.tab;
+            return (
+              <button
+                key={item.tab}
+                onClick={() => navigateTo(item.tab as StudentTab)}
+                className="flex flex-col items-center gap-1 relative focus:outline-none group py-1.5 px-3"
+              >
+                {/* Highlight background pill */}
+                {isActive && (
+                  <div className="absolute inset-0 bg-emerald-50 dark:bg-emerald-950/80 rounded-2xl scale-110 -z-10 animate-in fade-in zoom-in-90 duration-300" />
+                )}
+                <div className={`transition-transform duration-300 group-hover:scale-110 ${
+                  isActive ? 'text-emerald-600 dark:text-emerald-400 scale-110' : 'text-slate-400 dark:text-slate-500'
+                }`}>
+                  {item.icon}
+                </div>
+                <span className={`text-[8px] font-black uppercase tracking-widest mt-1 transition-all ${
+                  isActive ? 'text-emerald-700 dark:text-emerald-300 opacity-100' : 'text-slate-400 dark:text-slate-500 opacity-80'
+                }`}>
+                  {item.label}
+                </span>
+              </button>
+            );
+          })}
+        </nav>
+      )}
 
       {/* Popups and Modals */}
       {showPlacedPopup && (
@@ -1683,15 +1722,26 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
         onCapture={handleCameraPhotoCapture}
       />
 
-      {/* App Settings Modal */}
+      {/* App Settings Modal (Full Screen Page) */}
       <SettingsModal 
-        isOpen={isSettingsOpen}
-        onClose={() => setIsSettingsOpen(false)}
+        isOpen={isSettingsOpen || activeTab === 'settings'}
+        onClose={() => {
+          setIsSettingsOpen(false);
+          if (activeTab === 'settings') {
+            setActiveTab('home');
+          }
+        }}
         user={user}
         menu={menu}
         onOpenCamera={() => setIsCameraOpen(true)}
         permission={permission}
         onRequestPermission={requestNotificationPermission}
+        studentProfile={studentProfile}
+        onUpdateProfile={onUpdateProfile}
+        onLogout={onLogout}
+        onNavigateToTab={(tab) => setActiveTab(tab as StudentTab)}
+        vegPreference={dietaryFilter}
+        onUpdateVegPreference={(pref) => setDietaryFilter(pref)}
       />
 
       {/* Printable Receipt Modal */}

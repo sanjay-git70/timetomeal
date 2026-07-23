@@ -202,6 +202,11 @@ const WalkInOrderView: React.FC<WalkInOrderViewProps> = ({ user, menu, onBack, o
               >
                 <div className="w-full aspect-square bg-gray-100 rounded-[1.5rem] overflow-hidden mb-3 shadow-inner relative">
                   <img src={item.imageUrl} className="w-full h-full object-cover transition-transform group-hover:scale-110" alt={item.item_name} />
+                  {item.is_veg === false ? (
+                    <span className="absolute top-2 left-2 bg-red-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded uppercase tracking-wider shadow">Non-Veg</span>
+                  ) : (
+                    <span className="absolute top-2 left-2 bg-emerald-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded uppercase tracking-wider shadow">Veg</span>
+                  )}
                   {isOutOfStock && (
                     <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-[2px] flex items-center justify-center">
                       <span className="bg-red-500 text-white px-2 py-0.5 rounded-lg font-black text-[9px] uppercase tracking-widest shadow-lg">Sold Out</span>

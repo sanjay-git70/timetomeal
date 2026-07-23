@@ -21,8 +21,19 @@ const App: React.FC = () => {
     const savedUser = localStorage.getItem('hb_current_user');
 
     if (savedOrders) setOrders(JSON.parse(savedOrders));
-    if (savedMenu) setMenu(JSON.parse(savedMenu));
-    else setMenu(MENU_ITEMS);
+    if (savedMenu) {
+      try {
+        const parsed: MenuItem[] = JSON.parse(savedMenu);
+        const existingIds = new Set(parsed.map(i => i.id));
+        const existingNames = new Set(parsed.map(i => i.item_name.toLowerCase()));
+        const missingDefaultItems = MENU_ITEMS.filter(i => !existingIds.has(i.id) && !existingNames.has(i.item_name.toLowerCase()));
+        setMenu([...parsed, ...missingDefaultItems]);
+      } catch (e) {
+        setMenu(MENU_ITEMS);
+      }
+    } else {
+      setMenu(MENU_ITEMS);
+    }
 
     if (savedUser) setUser(JSON.parse(savedUser));
     
@@ -77,17 +88,17 @@ const App: React.FC = () => {
   if (!user) return <Login onLogin={setUser} />;
 
   return (
-    <div className="min-h-screen bg-gray-50/50 text-gray-900 overflow-x-hidden selection:bg-emerald-500 selection:text-white">
+    <div className="min-h-screen bg-gray-50/50 dark:bg-slate-950 text-gray-900 dark:text-slate-100 transition-colors duration-300 overflow-x-hidden selection:bg-emerald-500 selection:text-white">
       {/* Admin Top Bar Overlay */}
       {user.role === 'admin' && (
-        <header className="bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between sticky top-0 z-50 shadow-sm print:hidden">
+        <header className="bg-white dark:bg-slate-900 border-b border-gray-100 dark:border-slate-800 px-6 py-4 flex items-center justify-between sticky top-0 z-50 shadow-sm print:hidden">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-2xl shadow-lg bg-gray-900">
+            <div className="p-2.5 rounded-2xl shadow-lg bg-gray-900 dark:bg-emerald-950">
               <Shield className="text-emerald-400 w-5 h-5" />
             </div>
             <div className="flex flex-col">
-              <h1 className="font-black text-gray-950 text-base leading-none">Master Console</h1>
-              <span className="text-[9px] text-emerald-600 font-black uppercase tracking-[0.15em] mt-1">Full System Authority</span>
+              <h1 className="font-black text-gray-950 dark:text-white text-base leading-none">Master Console</h1>
+              <span className="text-[9px] text-emerald-600 dark:text-emerald-400 font-black uppercase tracking-[0.15em] mt-1">Full System Authority</span>
             </div>
           </div>
         </header>
