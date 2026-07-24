@@ -576,26 +576,14 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
       <main className="max-w-2xl mx-auto">
         {/* DEDICATED FULL SEARCH PAGE VIEW */}
         {activeTab === 'search' && (
-          <div className="px-5 pt-3 space-y-5 animate-in fade-in duration-300 pb-24">
-            {/* Top Navigation Row */}
-            <div className="flex items-center justify-between">
-              <button 
-                onClick={() => navigateTo('home')}
-                className="flex items-center gap-1.5 text-slate-800 dark:text-white font-black hover:text-emerald-600 transition-colors py-2 px-3.5 -ml-2 rounded-2xl bg-slate-100 dark:bg-slate-800"
-              >
-                <ChevronLeft className="w-5 h-5 text-emerald-600 stroke-[3px]" />
-                <span className="text-xs uppercase tracking-wider font-extrabold">Back to Home</span>
-              </button>
-              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Search Food</span>
-            </div>
-
+          <div className="px-5 pt-2 space-y-4 animate-in fade-in duration-300 pb-24">
             {/* Integrated Search Bar with Right-Side Veg Switch Pill */}
-            <div className="relative flex items-center bg-[#cbd5e1]/40 dark:bg-slate-800/90 rounded-full border border-slate-200/80 dark:border-slate-700/80 shadow-inner px-4 py-1.5 transition-all focus-within:ring-2 focus-within:ring-emerald-500">
+            <div className="relative flex items-center bg-[#e2e8f0]/60 dark:bg-slate-800/90 rounded-full border border-slate-200/80 dark:border-slate-700/80 shadow-inner px-4 py-1.5 transition-all focus-within:ring-2 focus-within:ring-emerald-500">
               <Search className="w-4.5 h-4.5 text-gray-500 dark:text-slate-400 shrink-0 mr-2.5" />
               <input 
                 type="text" 
                 placeholder="Search pizza, sandwich, meals..." 
-                className="w-full bg-transparent border-none outline-none font-bold text-xs text-slate-800 dark:text-slate-100 placeholder:text-gray-500 dark:placeholder:text-slate-400 py-2.5"
+                className="w-full bg-transparent border-none outline-none font-bold text-xs text-slate-800 dark:text-slate-100 placeholder:text-gray-500 dark:placeholder:text-slate-400 py-2"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 autoFocus
@@ -617,16 +605,16 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
                   setDietaryFilter(next);
                   localStorage.setItem('hb_veg_preference', next);
                 }}
-                className="flex items-center gap-1.5 shrink-0 pl-2 focus:outline-none cursor-pointer border-l border-slate-300 dark:border-slate-700"
+                className="flex items-center gap-1.5 shrink-0 pl-2 focus:outline-none cursor-pointer border-l border-slate-300/80 dark:border-slate-700 ml-1"
                 title={dietaryFilter === 'veg' ? 'Veg Mode Active (Click to show all)' : 'Switch to Veg Mode'}
               >
-                <span className="text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-200 hidden sm:inline">
-                  {dietaryFilter === 'veg' ? '🌱 Veg' : 'Veg'}
+                <span className="text-[10px] font-black uppercase tracking-wider text-slate-600 dark:text-slate-300">
+                  Veg
                 </span>
-                <div className={`w-12 h-6.5 rounded-full p-0.5 transition-colors duration-300 flex items-center shadow-inner ${
-                  dietaryFilter === 'veg' ? 'bg-emerald-500 justify-end' : 'bg-amber-300 dark:bg-slate-700 justify-start'
+                <div className={`w-11 h-6 rounded-full p-0.5 transition-all duration-300 flex items-center shadow-inner ${
+                  dietaryFilter === 'veg' ? 'bg-amber-400 dark:bg-emerald-600 justify-end' : 'bg-slate-300/90 dark:bg-slate-700 justify-start'
                 }`}>
-                  <div className="w-5.5 h-5.5 rounded-full bg-amber-400 dark:bg-amber-300 shadow-md flex items-center justify-center text-[9px] font-bold">
+                  <div className="w-5 h-5 rounded-full bg-white shadow-md flex items-center justify-center text-[9px] font-bold transition-transform transform active:scale-90">
                     {dietaryFilter === 'veg' ? '🌱' : ''}
                   </div>
                 </div>
@@ -726,9 +714,9 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
             <div className="px-5">
               <div 
                 onClick={() => navigateTo('search')}
-                className="relative flex items-center bg-[#cbd5e1]/40 dark:bg-slate-800/80 rounded-full border border-gray-200/80 dark:border-slate-700/80 shadow-inner px-4 py-1.5 transition-all focus-within:ring-2 focus-within:ring-emerald-500 cursor-pointer"
+                className="relative flex items-center bg-[#e2e8f0]/60 dark:bg-slate-800/90 rounded-full border border-slate-200/80 dark:border-slate-700/80 shadow-inner px-4 py-1.5 transition-all focus-within:ring-2 focus-within:ring-emerald-500 cursor-pointer"
               >
-                <Search className="w-4 h-4 text-gray-500 dark:text-slate-400 shrink-0 mr-2.5" />
+                <Search className="w-4.5 h-4.5 text-gray-500 dark:text-slate-400 shrink-0 mr-2.5" />
                 <input 
                   type="text" 
                   placeholder="Search pizza, sandwich, meals..." 
@@ -749,16 +737,16 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
                     setDietaryFilter(next);
                     localStorage.setItem('hb_veg_preference', next);
                   }}
-                  className="flex items-center gap-1.5 shrink-0 pl-2 focus:outline-none cursor-pointer border-l border-slate-300 dark:border-slate-700"
+                  className="flex items-center gap-1.5 shrink-0 pl-2 focus:outline-none cursor-pointer border-l border-slate-300/80 dark:border-slate-700 ml-1"
                   title={dietaryFilter === 'veg' ? 'Veg Mode Active (Click to show all)' : 'Switch to Veg Mode'}
                 >
-                  <span className="text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-200 hidden sm:inline">
-                    {dietaryFilter === 'veg' ? '🌱 Veg' : 'Veg'}
+                  <span className="text-[10px] font-black uppercase tracking-wider text-slate-600 dark:text-slate-300">
+                    Veg
                   </span>
-                  <div className={`w-12 h-6.5 rounded-full p-0.5 transition-colors duration-300 flex items-center shadow-inner ${
-                    dietaryFilter === 'veg' ? 'bg-emerald-500 justify-end' : 'bg-amber-300 dark:bg-slate-700 justify-start'
+                  <div className={`w-11 h-6 rounded-full p-0.5 transition-all duration-300 flex items-center shadow-inner ${
+                    dietaryFilter === 'veg' ? 'bg-amber-400 dark:bg-emerald-600 justify-end' : 'bg-slate-300/90 dark:bg-slate-700 justify-start'
                   }`}>
-                    <div className="w-5.5 h-5.5 rounded-full bg-amber-400 dark:bg-amber-300 shadow-md flex items-center justify-center text-[9px] font-bold">
+                    <div className="w-5 h-5 rounded-full bg-white shadow-md flex items-center justify-center text-[9px] font-bold transition-transform transform active:scale-90">
                       {dietaryFilter === 'veg' ? '🌱' : ''}
                     </div>
                   </div>
