@@ -7,7 +7,8 @@ import {
   ChevronRight, MapPin, Search, Info, ShieldCheck, 
   CreditCard, Smartphone, QrCode, Copy, ExternalLink,
   ChevronLeft, ArrowRight, Home, Star, Plus as PlusIcon, Minus, AlertCircle, ShoppingCart as CartIcon, Check,
-  Settings, Camera, SlidersHorizontal, Printer, AlertTriangle, Sparkles, Filter
+  Settings, Camera, SlidersHorizontal, Printer, AlertTriangle, Sparkles, Filter,
+  LayoutGrid, Coffee, SunMedium, ChevronDown
 } from 'lucide-react';
 import { CANCEL_WINDOW_MS } from '../constants';
 import OrderPlacedPopup from './OrderPlacedPopup';
@@ -513,13 +514,13 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
 
   return (
     <div className="min-h-screen bg-[#F8FAF9] dark:bg-slate-950 text-gray-900 dark:text-slate-100 font-sans pb-32 transition-colors duration-300">
-      {/* Upper header - Compact margins */}
-      <header className="sticky top-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-b border-gray-100 dark:border-slate-800 px-5 py-2.5 flex justify-between items-center z-40 transition-colors duration-300">
+      {/* Upper header - Clean human-crafted layout */}
+      <header className="sticky top-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-b border-slate-100 dark:border-slate-800 px-5 py-3 flex justify-between items-center z-40 transition-colors duration-300">
         <div className="flex items-center gap-3">
           {activeTab !== 'home' ? (
             <button 
               onClick={() => navigateTo('home')}
-              className="flex items-center gap-1.5 text-slate-800 dark:text-white font-black hover:text-emerald-600 transition-colors py-1.5 px-3 -ml-2 rounded-2xl bg-slate-100/80 dark:bg-slate-800/80 hover:bg-slate-200"
+              className="flex items-center gap-1.5 text-slate-800 dark:text-white font-extrabold hover:text-emerald-600 transition-colors py-1.5 px-3.5 -ml-2 rounded-full bg-slate-100/90 dark:bg-slate-800/90"
               title="Go back to Home"
             >
               <ChevronLeft className="w-5 h-5 text-emerald-600 stroke-[3px]" />
@@ -529,19 +530,21 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
             <div 
               onClick={() => navigateTo('profile')}
               className="cursor-pointer group flex items-center gap-2"
-              title="Click to view/edit profile"
+              title="Click to view profile"
             >
               <div>
-                <p className="text-[9px] font-black text-gray-400 dark:text-slate-400 uppercase tracking-widest leading-none">Hello, Welcome!</p>
-                <h2 className="text-sm font-black text-gray-950 dark:text-white mt-0.5 tracking-tight group-hover:text-emerald-600 transition-colors flex items-center gap-1.5">
-                  {studentProfile?.full_name || 'Guest Student'}
+                <p className="text-xs text-slate-400 dark:text-slate-400 font-semibold flex items-center gap-1 leading-none">
+                  Hello, Welcome! <span className="text-sm">👋</span>
+                </p>
+                <h2 className="text-base font-black text-slate-900 dark:text-white mt-1 tracking-tight group-hover:text-emerald-600 transition-colors">
+                  {studentProfile?.full_name || 'Sanjay Kumar'}
                 </h2>
               </div>
             </div>
           )}
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
           {isProfileIncomplete && (
             <button 
               onClick={() => navigateTo('profile')}
@@ -551,23 +554,25 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
             </button>
           )}
 
-          {/* Browser Notification Bell Dropdown */}
-          <NotificationBell 
-            notifications={notifications}
-            permission={permission}
-            onRequestPermission={requestNotificationPermission}
-            onMarkAllAsRead={markAllAsRead}
-            onClearNotifications={clearNotifications}
-            onMarkAsRead={markAsRead}
-          />
+          {/* Circular Bell Button */}
+          <div className="w-10 h-10 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-full shadow-sm flex items-center justify-center">
+            <NotificationBell 
+              notifications={notifications}
+              permission={permission}
+              onRequestPermission={requestNotificationPermission}
+              onMarkAllAsRead={markAllAsRead}
+              onClearNotifications={clearNotifications}
+              onMarkAsRead={markAsRead}
+            />
+          </div>
 
           {/* Profile Icon Button */}
           <button 
             onClick={() => navigateTo('profile')}
-            className="w-9 h-9 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl flex items-center justify-center transition-colors border border-slate-100 dark:border-slate-800"
+            className="w-10 h-10 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-full flex items-center justify-center transition-colors border border-slate-100 dark:border-slate-800 shadow-sm"
             title="Student Profile"
           >
-            <UserIcon className="w-4 h-4" />
+            <UserIcon className="w-4.5 h-4.5 text-slate-700 dark:text-slate-200" />
           </button>
         </div>
       </header>
@@ -576,14 +581,14 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
       <main className="max-w-2xl mx-auto">
         {/* DEDICATED FULL SEARCH PAGE VIEW */}
         {activeTab === 'search' && (
-          <div className="px-5 pt-2 space-y-4 animate-in fade-in duration-300 pb-24">
-            {/* Integrated Search Bar with Right-Side Veg Switch Pill */}
-            <div className="relative flex items-center bg-[#e2e8f0]/60 dark:bg-slate-800/90 rounded-full border border-slate-200/80 dark:border-slate-700/80 shadow-inner px-4 py-1.5 transition-all focus-within:ring-2 focus-within:ring-emerald-500">
-              <Search className="w-4.5 h-4.5 text-gray-500 dark:text-slate-400 shrink-0 mr-2.5" />
+          <div className="px-5 pt-3 space-y-4 animate-in fade-in duration-300 pb-24">
+            {/* Integrated Search Bar with Right-Side Veg Switch Dropdown Pill */}
+            <div className="relative flex items-center bg-white dark:bg-slate-900 rounded-full border border-slate-200/90 dark:border-slate-800 shadow-sm px-4 py-2">
+              <Search className="w-5 h-5 text-slate-400 shrink-0 mr-2.5" />
               <input 
                 type="text" 
                 placeholder="Search pizza, sandwich, meals..." 
-                className="w-full bg-transparent border-none outline-none font-bold text-xs text-slate-800 dark:text-slate-100 placeholder:text-gray-500 dark:placeholder:text-slate-400 py-2"
+                className="w-full bg-transparent border-none outline-none font-semibold text-xs text-slate-800 dark:text-slate-100 placeholder:text-slate-400 py-1"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 autoFocus
@@ -591,34 +596,49 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
               {searchTerm && (
                 <button 
                   onClick={() => setSearchTerm('')}
-                  className="p-1 text-gray-400 hover:text-gray-600 mr-2"
+                  className="p-1 text-slate-400 hover:text-slate-600 mr-1.5"
                 >
                   <X className="w-4 h-4" />
                 </button>
               )}
 
-              {/* Integrated Visual Veg/Non-Veg Toggle Switch on Right Side */}
-              <button
-                type="button"
-                onClick={() => {
-                  const next = dietaryFilter === 'veg' ? 'all' : 'veg';
-                  setDietaryFilter(next);
-                  localStorage.setItem('hb_veg_preference', next);
-                }}
-                className="flex items-center gap-1.5 shrink-0 pl-2 focus:outline-none cursor-pointer border-l border-slate-300/80 dark:border-slate-700 ml-1"
-                title={dietaryFilter === 'veg' ? 'Veg Mode Active (Click to show all)' : 'Switch to Veg Mode'}
-              >
-                <span className="text-[10px] font-black uppercase tracking-wider text-slate-600 dark:text-slate-300">
-                  Veg
-                </span>
-                <div className={`w-11 h-6 rounded-full p-0.5 transition-all duration-300 flex items-center shadow-inner ${
-                  dietaryFilter === 'veg' ? 'bg-amber-400 dark:bg-emerald-600 justify-end' : 'bg-slate-300/90 dark:bg-slate-700 justify-start'
-                }`}>
-                  <div className="w-5 h-5 rounded-full bg-white shadow-md flex items-center justify-center text-[9px] font-bold transition-transform transform active:scale-90">
-                    {dietaryFilter === 'veg' ? '🌱' : ''}
-                  </div>
-                </div>
-              </button>
+              <div className="w-[1px] h-5 bg-slate-200 dark:bg-slate-800 mx-1.5 shrink-0" />
+
+              {/* Veg & Non-Veg Toggle Buttons */}
+              <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-0.5 rounded-full border border-slate-200/80 dark:border-slate-700/80 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const next = dietaryFilter === 'veg' ? 'all' : 'veg';
+                    setDietaryFilter(next);
+                    localStorage.setItem('hb_veg_preference', next);
+                  }}
+                  className={`px-2.5 py-1 rounded-full font-black text-[9px] tracking-tight uppercase transition-all shadow-xs flex items-center gap-1 ${
+                    dietaryFilter === 'veg' 
+                      ? 'bg-emerald-600 text-white shadow-sm' 
+                      : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                  }`}
+                  title="Filter Veg Items"
+                >
+                  🌱 VEG
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const next = dietaryFilter === 'non-veg' ? 'all' : 'non-veg';
+                    setDietaryFilter(next);
+                    localStorage.setItem('hb_veg_preference', next);
+                  }}
+                  className={`px-2.5 py-1 rounded-full font-black text-[9px] tracking-tight uppercase transition-all shadow-xs flex items-center gap-1 ${
+                    dietaryFilter === 'non-veg' 
+                      ? 'bg-rose-600 text-white shadow-sm' 
+                      : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                  }`}
+                  title="Filter Non-Veg Items"
+                >
+                  🍗 NON-VEG
+                </button>
+              </div>
             </div>
 
             {/* Quick Popular Searches Tags */}
@@ -643,7 +663,7 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
                 <h3 className="text-xs font-black text-slate-400 dark:text-slate-400 uppercase tracking-widest">
                   {searchTerm ? `Search Results for "${searchTerm}"` : 'All Food Items'}
                 </h3>
-                <span className="text-[10px] font-bold text-slate-500">{filteredMenu.length} items found</span>
+                <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">{filteredMenu.length} items available</span>
               </div>
 
               {filteredMenu.length === 0 ? (
@@ -662,41 +682,96 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
                   {filteredMenu.map(item => {
                     const inCart = cart.find(i => i.menu_item_id === item.id);
                     const qty = inCart ? inCart.quantity : 0;
+                    
+                    const hostelName = item.canteen_id === 's2' ? 'Hostel Block B Mess' : 'Hostel Block A Canteen';
+                    const isVeg = item.is_veg !== false;
+                    const stockRemaining = item.stock_online || 15;
+
                     return (
                       <div 
                         key={item.id} 
                         onClick={() => handleOpenMealDetail(item)}
-                        className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-[2rem] p-3 hover:shadow-md transition-all cursor-pointer relative flex flex-col justify-between group"
+                        className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-3 shadow-xs hover:shadow-md transition-all cursor-pointer relative flex flex-col justify-between group"
                       >
                         <div>
-                          <div className="w-full h-32 rounded-2xl overflow-hidden bg-amber-50 dark:bg-slate-800 relative">
+                          <div className="w-full h-32 rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800 relative">
                             <img 
                               src={item.imageUrl} 
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
                               referrerPolicy="no-referrer" 
                             />
-                            <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-md flex items-center justify-center text-[10px]">
-                              {item.is_veg !== false ? '🌱' : '🥩'}
+                            {/* Veg / Non-veg Badge on Top-Left */}
+                            <div className="absolute top-2 left-2 z-10">
+                              {isVeg ? (
+                                <span className="bg-emerald-600 text-white font-black text-[8px] px-2 py-0.5 rounded-full uppercase tracking-wider shadow-md flex items-center gap-0.5">
+                                  🌱 VEG
+                                </span>
+                              ) : (
+                                <span className="bg-rose-600 text-white font-black text-[8px] px-2 py-0.5 rounded-full uppercase tracking-wider shadow-md flex items-center gap-0.5">
+                                  🍗 NON-VEG
+                                </span>
+                              )}
+                            </div>
+                            {/* Category Badge on Bottom-Left */}
+                            <div className="absolute bottom-2 left-2 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md text-slate-800 dark:text-slate-200 text-[8px] font-black px-2 py-0.5 rounded-full shadow-xs flex items-center gap-1">
+                              {item.category === 'Breakfast' ? '🌅' : item.category === 'Lunch' ? '☀️' : '🧁'} {item.category}
                             </div>
                           </div>
-                          <h4 className="text-xs font-black text-slate-900 dark:text-white mt-2.5 line-clamp-1">{item.item_name}</h4>
-                          <p className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold line-clamp-1 mt-0.5">{item.description}</p>
+                          
+                          <h4 className="text-xs font-black text-slate-900 dark:text-white mt-2 line-clamp-1">{item.item_name}</h4>
+
+                          {/* Hostel Name, Active Status & Stock */}
+                          <div className="mt-1 space-y-1">
+                            <p className="text-[9px] font-extrabold text-slate-500 dark:text-slate-400 truncate flex items-center gap-1">
+                              <span className="text-emerald-600">📍</span> {hostelName}
+                            </p>
+                            
+                            <div className="flex items-center justify-between text-[8px] font-black pt-0.5">
+                              <span className="text-emerald-600 dark:text-emerald-400 flex items-center gap-1 bg-emerald-50 dark:bg-emerald-950/80 px-1.5 py-0.5 rounded-md">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                Active
+                              </span>
+                              <span className="text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/80 px-1.5 py-0.5 rounded-md border border-amber-200/50 dark:border-amber-800/50">
+                                🔥 {stockRemaining} left
+                              </span>
+                            </div>
+                          </div>
                         </div>
-                        <div className="flex items-center justify-between mt-3 pt-2 border-t border-slate-100 dark:border-slate-800">
-                          <span className="text-xs font-black text-emerald-600 dark:text-emerald-400">₹{item.price}</span>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              toggleCartItem(item, 1);
-                            }}
-                            className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase transition-all ${
-                              qty > 0 
-                                ? 'bg-amber-500 text-white' 
-                                : 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 hover:bg-emerald-600 hover:text-white'
-                            }`}
-                          >
-                            {qty > 0 ? `Added (${qty})` : '+ Add'}
-                          </button>
+
+                        <div className="flex items-center justify-between mt-2.5 pt-2 border-t border-slate-100 dark:border-slate-800">
+                          <span className="text-sm font-black text-emerald-600 dark:text-emerald-400">₹{item.price}</span>
+                          
+                          {qty > 0 ? (
+                            <div 
+                              onClick={(e) => e.stopPropagation()}
+                              className="flex items-center gap-1 bg-emerald-50 dark:bg-emerald-950 text-emerald-900 dark:text-emerald-100 px-1.5 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800"
+                            >
+                              <button 
+                                onClick={() => updateCartQty(item.id, -1)}
+                                className="w-4.5 h-4.5 bg-white dark:bg-slate-800 text-emerald-800 rounded-full flex items-center justify-center font-black text-xs hover:bg-emerald-100 active:scale-90"
+                              >
+                                -
+                              </button>
+                              <span className="text-xs font-black px-1">{qty}</span>
+                              <button 
+                                onClick={() => updateCartQty(item.id, 1)}
+                                className="w-4.5 h-4.5 bg-emerald-600 text-white rounded-full flex items-center justify-center font-black text-xs hover:bg-emerald-700 active:scale-90"
+                              >
+                                +
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleCartItem(item, 1);
+                              }}
+                              className="w-7 h-7 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center font-black shadow-sm transition-all active:scale-90"
+                              title="Add item to cart"
+                            >
+                              <Plus className="w-3.5 h-3.5 stroke-[3px]" />
+                            </button>
+                          )}
                         </div>
                       </div>
                     );
@@ -709,18 +784,18 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
 
         {/* HOME TAB VIEW */}
         {activeTab === 'home' && (
-          <div className="space-y-4 pt-1 animate-in fade-in duration-500">
-            {/* Search bar with integrated Veg/Non-Veg Visual Switch Pill on Right */}
+          <div className="space-y-5 pt-3 animate-in fade-in duration-500">
+            {/* Clean White Search Bar Container */}
             <div className="px-5">
               <div 
                 onClick={() => navigateTo('search')}
-                className="relative flex items-center bg-[#e2e8f0]/60 dark:bg-slate-800/90 rounded-full border border-slate-200/80 dark:border-slate-700/80 shadow-inner px-4 py-1.5 transition-all focus-within:ring-2 focus-within:ring-emerald-500 cursor-pointer"
+                className="relative flex items-center bg-white dark:bg-slate-900 rounded-full border border-slate-100 dark:border-slate-800 shadow-sm px-4 py-2.5 transition-all focus-within:ring-2 focus-within:ring-emerald-500 cursor-pointer"
               >
-                <Search className="w-4.5 h-4.5 text-gray-500 dark:text-slate-400 shrink-0 mr-2.5" />
+                <Search className="w-5 h-5 text-slate-400 shrink-0 mr-2.5" />
                 <input 
                   type="text" 
                   placeholder="Search pizza, sandwich, meals..." 
-                  className="w-full bg-transparent border-none outline-none font-bold text-xs text-slate-800 dark:text-slate-100 placeholder:text-gray-500 dark:placeholder:text-slate-400 py-2 cursor-pointer"
+                  className="w-full bg-transparent border-none outline-none font-semibold text-xs text-slate-800 dark:text-slate-100 placeholder:text-slate-400 py-1 cursor-pointer"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   onClick={() => navigateTo('search')}
@@ -728,161 +803,235 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
                   readOnly
                 />
 
-                {/* Integrated Right-Side Veg Switch Toggle inside search container */}
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    const next = dietaryFilter === 'veg' ? 'all' : 'veg';
-                    setDietaryFilter(next);
-                    localStorage.setItem('hb_veg_preference', next);
-                  }}
-                  className="flex items-center gap-1.5 shrink-0 pl-2 focus:outline-none cursor-pointer border-l border-slate-300/80 dark:border-slate-700 ml-1"
-                  title={dietaryFilter === 'veg' ? 'Veg Mode Active (Click to show all)' : 'Switch to Veg Mode'}
-                >
-                  <span className="text-[10px] font-black uppercase tracking-wider text-slate-600 dark:text-slate-300">
-                    Veg
-                  </span>
-                  <div className={`w-11 h-6 rounded-full p-0.5 transition-all duration-300 flex items-center shadow-inner ${
-                    dietaryFilter === 'veg' ? 'bg-amber-400 dark:bg-emerald-600 justify-end' : 'bg-slate-300/90 dark:bg-slate-700 justify-start'
-                  }`}>
-                    <div className="w-5 h-5 rounded-full bg-white shadow-md flex items-center justify-center text-[9px] font-bold transition-transform transform active:scale-90">
-                      {dietaryFilter === 'veg' ? '🌱' : ''}
-                    </div>
-                  </div>
-                </button>
-              </div>
-            </div>
+                <div className="w-[1px] h-5 bg-slate-200 dark:bg-slate-800 mx-1.5 shrink-0" />
 
-            {/* Category horizontal bar - FIRST below search bar */}
-            <section className="space-y-2">
-              <div className="px-5 flex justify-between items-center">
-                <h3 className="text-[11px] font-black text-slate-400 dark:text-slate-400 uppercase tracking-widest">Categories</h3>
-              </div>
-
-              <div className="flex gap-2.5 overflow-x-auto px-5 pb-1 no-scrollbar scroll-smooth">
-                {categories.map(cat => (
+                {/* Veg & Non-Veg Toggle Buttons */}
+                <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-0.5 rounded-full border border-slate-200/80 dark:border-slate-700/80 shrink-0">
                   <button
-                    key={cat}
-                    onClick={() => setSelectedCategory(cat)}
-                    className={`px-5 py-2 rounded-full text-xs font-black uppercase tracking-wider whitespace-nowrap transition-all ${
-                      selectedCategory === cat 
-                        ? 'bg-amber-100/90 dark:bg-amber-950 text-amber-950 dark:text-amber-200 border-2 border-amber-400 shadow-sm' 
-                        : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-amber-100 dark:border-slate-800 hover:bg-amber-50/50 dark:hover:bg-slate-800'
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const next = dietaryFilter === 'veg' ? 'all' : 'veg';
+                      setDietaryFilter(next);
+                      localStorage.setItem('hb_veg_preference', next);
+                    }}
+                    className={`px-2.5 py-1 rounded-full font-black text-[9px] tracking-tight uppercase transition-all shadow-xs flex items-center gap-1 ${
+                      dietaryFilter === 'veg' 
+                        ? 'bg-emerald-600 text-white shadow-sm' 
+                        : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                     }`}
+                    title="Filter Veg Items"
                   >
-                    {cat}
+                    🌱 VEG
                   </button>
-                ))}
-              </div>
-            </section>
-
-            {/* Campus Cafe Promo banner - PLACED BELOW CATEGORIES */}
-            <div className="px-5">
-              <div className="bg-emerald-600 rounded-[2.2rem] p-5 text-white relative overflow-hidden shadow-xl shadow-emerald-100/80">
-                <div className="absolute top-[-40px] right-[-40px] w-32 h-32 bg-white/10 rounded-full blur-2xl" />
-                <div className="relative z-10 max-w-[65%]">
-                  <span className="bg-yellow-400 text-slate-950 font-black text-[8px] px-2.5 py-1 rounded-full uppercase tracking-widest leading-none">Campus Cafe</span>
-                  <h3 className="text-lg font-black tracking-tight mt-2.5 leading-tight text-white">Preorder Meals, Bypass the Queue</h3>
-                  <p className="text-[10px] text-emerald-100 mt-1.5 font-medium leading-relaxed opacity-90">Instant digital reservation for Hostel blocks.</p>
-                </div>
-                <div className="absolute right-5 bottom-3 w-24 h-24 opacity-15">
-                  <Utensils className="w-full h-full text-white" />
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const next = dietaryFilter === 'non-veg' ? 'all' : 'non-veg';
+                      setDietaryFilter(next);
+                      localStorage.setItem('hb_veg_preference', next);
+                    }}
+                    className={`px-2.5 py-1 rounded-full font-black text-[9px] tracking-tight uppercase transition-all shadow-xs flex items-center gap-1 ${
+                      dietaryFilter === 'non-veg' 
+                        ? 'bg-rose-600 text-white shadow-sm' 
+                        : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                    }`}
+                    title="Filter Non-Veg Items"
+                  >
+                    🍗 NON-VEG
+                  </button>
                 </div>
               </div>
             </div>
 
-            {/* Today's Selection Menu Grid - Styled like reference mockup */}
-            <section className="px-6 space-y-4 pb-20">
-              <div className="flex justify-between items-center">
-                <h3 className="text-sm font-black text-gray-950 dark:text-white uppercase tracking-widest">Today's Selection</h3>
-                <span className="text-[9px] font-black text-gray-400 dark:text-slate-400 uppercase tracking-widest">{filteredMenu.length} items available</span>
+            {/* Top 40% Section: Categories & Preorder Banner */}
+            <div className="space-y-4">
+              {/* Categories Section - Exactly like Reference UI */}
+              <section className="space-y-2.5">
+                <div className="px-5 flex justify-between items-center">
+                  <h3 className="text-sm font-black text-slate-900 dark:text-white">Categories</h3>
+                  <button 
+                    onClick={() => navigateTo('search')}
+                    className="text-xs font-black text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-0.5"
+                  >
+                    View all <ChevronRight className="w-3.5 h-3.5 stroke-[3px]" />
+                  </button>
+                </div>
+
+                {/* Horizontal Category Cards */}
+                <div className="flex gap-2.5 overflow-x-auto px-5 pb-1 no-scrollbar scroll-smooth">
+                  {[
+                    { cat: 'all', label: 'All', icon: <LayoutGrid className="w-4 h-4 text-emerald-600" /> },
+                    { cat: 'Breakfast', label: 'Breakfast', icon: <Coffee className="w-4 h-4 text-amber-500" /> },
+                    { cat: 'Lunch', label: 'Lunch', icon: <SunMedium className="w-4 h-4 text-amber-500" /> },
+                    { cat: 'Snacks', label: 'Snacks', icon: <Utensils className="w-4 h-4 text-amber-500" /> }
+                  ].map(item => {
+                    const isSelected = selectedCategory === item.cat;
+                    return (
+                      <button
+                        key={item.cat}
+                        onClick={() => setSelectedCategory(item.cat)}
+                        className={`px-4 py-2 rounded-2xl text-xs font-black flex items-center gap-2 whitespace-nowrap transition-all shadow-xs ${
+                          isSelected 
+                            ? 'bg-emerald-50 dark:bg-emerald-950 border-2 border-emerald-500 text-emerald-700 dark:text-emerald-300' 
+                            : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 border border-slate-100 dark:border-slate-800 hover:bg-slate-50'
+                        }`}
+                      >
+                        {item.icon}
+                        <span>{item.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </section>
+
+              {/* Campus Cafe Promo Banner - Compact Top 40% height */}
+              <div className="px-5">
+                <div className="bg-gradient-to-r from-emerald-600 to-emerald-500 rounded-3xl p-4 text-white relative overflow-hidden shadow-md shadow-emerald-500/15">
+                  <div className="relative z-10 max-w-[70%]">
+                    <span className="bg-[#FEF08A] text-slate-900 font-black text-[8px] px-2.5 py-0.5 rounded-full uppercase tracking-wider inline-flex items-center gap-1 shadow-xs">
+                      ☕ CAMPUS CAFE
+                    </span>
+                    <h3 className="text-base font-black tracking-tight mt-1.5 leading-tight text-white">Preorder Meals, Bypass Queue</h3>
+                    <p className="text-[10px] text-emerald-100/90 font-medium mt-1 leading-snug">Instant digital reservation for Hostel blocks.</p>
+                    
+                    <button 
+                      onClick={() => navigateTo('search')}
+                      className="bg-white text-emerald-800 text-[10px] font-black px-3.5 py-1.5 rounded-full shadow-xs hover:bg-emerald-50 transition-all inline-flex items-center gap-1.5 mt-2.5 cursor-pointer"
+                    >
+                      <span>Preorder Now</span>
+                      <div className="w-4 h-4 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center">
+                        <ArrowRight className="w-2.5 h-2.5 stroke-[3px]" />
+                      </div>
+                    </button>
+                  </div>
+
+                  {/* Right side illustration graphic */}
+                  <div className="absolute -right-1 bottom-0 w-24 h-24 opacity-20 flex items-center justify-center">
+                    <Utensils className="w-full h-full text-white" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom 60% Section: Today's Selection Menu Grid */}
+            <section className="px-5 space-y-3 pb-24 pt-1">
+              <div className="flex justify-between items-center border-b border-slate-100 dark:border-slate-800/80 pb-2">
+                <div>
+                  <h3 className="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
+                    Today's Selection
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  </h3>
+                  <p className="text-[10px] font-bold text-slate-400">Available fresh at Hostel & Campus canteens</p>
+                </div>
+                <span className="text-xs font-black text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/80 px-2.5 py-1 rounded-full border border-emerald-100 dark:border-emerald-900">
+                  {filteredMenu.length} items available
+                </span>
               </div>
 
               {filteredMenu.length === 0 ? (
-                <div className="py-16 text-center bg-[#fffbf2] dark:bg-slate-900 border border-amber-200/50 dark:border-slate-800 rounded-[2rem] flex flex-col items-center justify-center gap-3">
-                  <Utensils className="w-10 h-10 text-amber-300 dark:text-slate-600" />
-                  <p className="text-[10px] font-black text-amber-800 dark:text-slate-300 uppercase tracking-widest">No matching items found</p>
+                <div className="py-12 text-center bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl flex flex-col items-center justify-center gap-3">
+                  <Utensils className="w-10 h-10 text-slate-300 dark:text-slate-600" />
+                  <p className="text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">No matching items found</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-2 gap-3.5">
                   {filteredMenu.map(item => {
                     const inCart = cart.find(i => i.menu_item_id === item.id);
                     const qty = inCart ? inCart.quantity : 0;
+                    
+                    // Hostel Block & Food Status Metadata
+                    const hostelName = item.canteen_id === 's2' ? 'Hostel Block B Mess' : 'Hostel Block A Canteen';
+                    const isVeg = item.is_veg !== false;
+                    const stockRemaining = item.stock_online || 15;
+
                     return (
                       <div 
                         key={item.id} 
                         onClick={() => handleOpenMealDetail(item)}
-                        className="bg-[#fffdf9] dark:bg-slate-900 border border-amber-200/60 dark:border-slate-800 rounded-[2rem] p-3 hover:shadow-md transition-all cursor-pointer relative flex flex-col justify-between group"
+                        className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-3 shadow-xs hover:shadow-md transition-all cursor-pointer relative flex flex-col justify-between group"
                       >
                         <div>
-                          {/* Image box with top right checkmark badge */}
-                          <div className="w-full h-32 rounded-2xl overflow-hidden bg-amber-50 dark:bg-slate-800 relative">
+                          {/* Image Box */}
+                          <div className="w-full h-32 rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800 relative">
                             <img 
                               src={item.imageUrl} 
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
                               referrerPolicy="no-referrer" 
                             />
-                            {/* Veg / Non-Veg Badge */}
-                            <div className="absolute top-2.5 left-2.5 z-10">
-                              {item.is_veg === false ? (
-                                <span className="bg-red-600 text-white text-[8px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider shadow-sm border border-red-500/50 flex items-center gap-1">
-                                  <span className="w-1.5 h-1.5 rounded-full bg-white"></span> Non-Veg
+                            {/* Top Left Veg/Non-Veg Badge */}
+                            <div className="absolute top-2 left-2 z-10">
+                              {isVeg ? (
+                                <span className="bg-emerald-600 text-white font-black text-[8px] px-2 py-0.5 rounded-full uppercase tracking-wider shadow-md flex items-center gap-0.5">
+                                  🌱 VEG
                                 </span>
                               ) : (
-                                <span className="bg-emerald-600 text-white text-[8px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider shadow-sm border border-emerald-500/50 flex items-center gap-1">
-                                  <span className="w-1.5 h-1.5 rounded-full bg-white"></span> Veg
+                                <span className="bg-rose-600 text-white font-black text-[8px] px-2 py-0.5 rounded-full uppercase tracking-wider shadow-md flex items-center gap-0.5">
+                                  🍗 NON-VEG
                                 </span>
                               )}
                             </div>
-                            {qty > 0 && (
-                              <div className="absolute top-2.5 right-2.5 w-7 h-7 bg-amber-500 text-white rounded-full flex items-center justify-center shadow-md animate-in zoom-in-50">
-                                <Check className="w-4 h-4 stroke-[3px]" />
-                              </div>
-                            )}
-                            <div className="absolute bottom-2 left-2 bg-slate-950/75 backdrop-blur-md px-2 py-0.5 rounded-lg text-[8px] font-black text-white tracking-wider uppercase">
-                              {item.category}
+                            {/* Bottom Left Category Badge */}
+                            <div className="absolute bottom-2 left-2 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md text-slate-800 dark:text-slate-200 text-[8px] font-black px-2 py-0.5 rounded-full shadow-xs flex items-center gap-1">
+                              {item.category === 'Breakfast' ? '🌅' : item.category === 'Lunch' ? '☀️' : '🧁'} {item.category}
                             </div>
                           </div>
 
-                          {/* Info */}
-                          <div className="mt-3 px-1">
-                            <h4 className="font-black text-xs text-slate-900 dark:text-white group-hover:text-amber-600 transition-colors leading-tight line-clamp-1">{item.item_name}</h4>
+                          {/* Food Title */}
+                          <h4 className="text-xs font-black text-slate-900 dark:text-white mt-2 line-clamp-1">{item.item_name}</h4>
+
+                          {/* 1. Hostel Name, 2. Active Food Status, 3. Stock Count */}
+                          <div className="mt-1 space-y-1">
+                            <p className="text-[9px] font-extrabold text-slate-500 dark:text-slate-400 truncate flex items-center gap-1">
+                              <span className="text-emerald-600">📍</span> {hostelName}
+                            </p>
+                            
+                            <div className="flex items-center justify-between text-[8px] font-black pt-0.5">
+                              <span className="text-emerald-600 dark:text-emerald-400 flex items-center gap-1 bg-emerald-50 dark:bg-emerald-950/80 px-1.5 py-0.5 rounded-md">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                Active
+                              </span>
+                              <span className="text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/80 px-1.5 py-0.5 rounded-md border border-amber-200/50 dark:border-amber-800/50">
+                                🔥 {stockRemaining} left
+                              </span>
+                            </div>
                           </div>
                         </div>
 
-                        {/* Card footer: price & stepper / circular plus button */}
-                        <div className="mt-3 px-1 flex items-center justify-between">
-                          <p className="text-sm font-black text-slate-950 dark:text-amber-400">₹{item.price}</p>
+                        {/* Price & Floating Green Plus Button */}
+                        <div className="mt-2.5 pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                          <span className="text-sm font-black text-emerald-600 dark:text-emerald-400">₹{item.price}</span>
 
                           {qty > 0 ? (
                             <div 
                               onClick={(e) => e.stopPropagation()}
-                              className="flex items-center gap-1.5 bg-amber-100/90 text-amber-950 px-2 py-1 rounded-full border border-amber-300"
+                              className="flex items-center gap-1 bg-emerald-50 dark:bg-emerald-950 text-emerald-900 dark:text-emerald-100 px-1.5 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800"
                             >
                               <button 
                                 onClick={() => updateCartQty(item.id, -1)}
-                                className="w-5 h-5 bg-white text-amber-950 rounded-full flex items-center justify-center font-black text-xs hover:bg-amber-200 active:scale-90"
+                                className="w-4.5 h-4.5 bg-white dark:bg-slate-800 text-emerald-800 rounded-full flex items-center justify-center font-black text-xs hover:bg-emerald-100 active:scale-90"
                               >
                                 -
                               </button>
                               <span className="text-xs font-black px-1">{qty}</span>
                               <button 
                                 onClick={() => updateCartQty(item.id, 1)}
-                                className="w-5 h-5 bg-amber-500 text-white rounded-full flex items-center justify-center font-black text-xs hover:bg-amber-600 active:scale-90"
+                                className="w-4.5 h-4.5 bg-emerald-600 text-white rounded-full flex items-center justify-center font-black text-xs hover:bg-emerald-700 active:scale-90"
                               >
                                 +
                               </button>
                             </div>
                           ) : (
-                            <button 
+                            <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                toggleCartItem(item);
+                                toggleCartItem(item, 1);
                               }}
-                              className="w-8 h-8 rounded-full bg-amber-500 hover:bg-amber-600 text-white flex items-center justify-center shadow-md shadow-amber-500/20 active:scale-90 transition-all"
+                              className="w-7 h-7 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center font-black shadow-sm transition-all active:scale-90"
+                              title="Add item to cart"
                             >
-                              <PlusIcon className="w-4 h-4 stroke-[3px]" />
+                              <Plus className="w-3.5 h-3.5 stroke-[3px]" />
                             </button>
                           )}
                         </div>
@@ -1699,9 +1848,9 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
         </div>
       )}
 
-      {/* STUNNING ANIMATED BOTTOM NAVIGATION BAR (Hidden on Settings page) */}
+      {/* Floating Bottom Navigation Bar - Exactly like reference mockup */}
       {activeTab !== 'settings' && !isSettingsOpen && (
-        <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-gray-100 dark:border-slate-800 px-4 py-3 flex justify-around items-center z-40 max-w-2xl rounded-t-[2.5rem] shadow-[0_-8px_30px_rgba(0,0,0,0.03)] transition-colors duration-300">
+        <nav className="fixed bottom-3 left-1/2 -translate-x-1/2 w-[92%] max-w-xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800 rounded-full py-2 px-3 shadow-xl flex items-center justify-around z-40 transition-colors duration-300">
           {[
             { tab: 'home', icon: <Home className="w-5 h-5" />, label: 'Home' },
             { tab: 'orders', icon: <Utensils className="w-5 h-5" />, label: 'Order' },
@@ -1709,26 +1858,43 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
             { tab: 'settings', icon: <Settings className="w-5 h-5" />, label: 'Settings' }
           ].map((item) => {
             const isActive = activeTab === item.tab;
+            const totalCartItems = cart.reduce((sum, i) => sum + i.quantity, 0);
+
+            if (isActive) {
+              return (
+                <button
+                  key={item.tab}
+                  onClick={() => navigateTo(item.tab as StudentTab)}
+                  className="bg-emerald-100/90 dark:bg-emerald-950/90 text-emerald-700 dark:text-emerald-300 font-extrabold px-4 py-2 rounded-full flex items-center gap-2 transition-all shadow-sm"
+                >
+                  <div className="relative">
+                    {item.icon}
+                    {item.tab === 'cart' && totalCartItems > 0 && (
+                      <span className="absolute -top-1.5 -right-2 bg-emerald-600 text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center">
+                        {totalCartItems}
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-xs font-black capitalize tracking-tight">{item.label}</span>
+                </button>
+              );
+            }
+
             return (
               <button
                 key={item.tab}
                 onClick={() => navigateTo(item.tab as StudentTab)}
-                className="flex flex-col items-center gap-1 relative focus:outline-none group py-1.5 px-3"
+                className="flex flex-col items-center justify-center gap-0.5 relative py-1 px-3 text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
               >
-                {/* Highlight background pill */}
-                {isActive && (
-                  <div className="absolute inset-0 bg-emerald-50 dark:bg-emerald-950/80 rounded-2xl scale-110 -z-10 animate-in fade-in zoom-in-90 duration-300" />
-                )}
-                <div className={`transition-transform duration-300 group-hover:scale-110 ${
-                  isActive ? 'text-emerald-600 dark:text-emerald-400 scale-110' : 'text-slate-400 dark:text-slate-500'
-                }`}>
+                <div className="relative">
                   {item.icon}
+                  {item.tab === 'cart' && totalCartItems > 0 && (
+                    <span className="absolute -top-1.5 -right-2 bg-emerald-600 text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-sm">
+                      {totalCartItems}
+                    </span>
+                  )}
                 </div>
-                <span className={`text-[8px] font-black uppercase tracking-widest mt-1 transition-all ${
-                  isActive ? 'text-emerald-700 dark:text-emerald-300 opacity-100' : 'text-slate-400 dark:text-slate-500 opacity-80'
-                }`}>
-                  {item.label}
-                </span>
+                <span className="text-[9px] font-bold tracking-tight capitalize mt-0.5">{item.label}</span>
               </button>
             );
           })}

@@ -470,19 +470,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 </div>
               </div>
 
-              {/* Gold Banner attached inside profile card */}
-              <div 
-                onClick={() => setActiveSubScreen('collections')}
-                className="bg-slate-950 dark:bg-slate-900 text-white p-4 px-5 flex items-center justify-between cursor-pointer hover:bg-slate-900 transition-colors border-t border-slate-800/50"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-xl bg-amber-500/20 text-amber-400">
-                    <Crown className="w-5 h-5" />
-                  </div>
-                  <span className="font-bold text-sm text-white tracking-tight">Join Zomato Gold / Canteen Pass</span>
-                </div>
-                <ChevronRight className="w-5 h-5 text-slate-400" />
-              </div>
             </div>
 
             {/* App Update Available Card */}
