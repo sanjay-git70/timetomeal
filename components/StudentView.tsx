@@ -691,10 +691,11 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
                       <div 
                         key={item.id} 
                         onClick={() => handleOpenMealDetail(item)}
-                        className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-3 shadow-xs hover:shadow-md transition-all cursor-pointer relative flex flex-col justify-between group"
+                        className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[1.75rem] p-3 shadow-xs hover:shadow-md transition-all cursor-pointer relative flex flex-col justify-between group"
                       >
                         <div>
-                          <div className="w-full h-32 rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800 relative">
+                          {/* Image Box */}
+                          <div className="w-full h-32 rounded-[1.25rem] overflow-hidden bg-slate-100 dark:bg-slate-800 relative">
                             <img 
                               src={item.imageUrl} 
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
@@ -703,73 +704,79 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
                             {/* Veg / Non-veg Badge on Top-Left */}
                             <div className="absolute top-2 left-2 z-10">
                               {isVeg ? (
-                                <span className="bg-emerald-600 text-white font-black text-[8px] px-2 py-0.5 rounded-full uppercase tracking-wider shadow-md flex items-center gap-0.5">
+                                <span className="bg-emerald-600 text-white font-extrabold text-[8px] px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm flex items-center gap-0.5">
                                   🌱 VEG
                                 </span>
                               ) : (
-                                <span className="bg-rose-600 text-white font-black text-[8px] px-2 py-0.5 rounded-full uppercase tracking-wider shadow-md flex items-center gap-0.5">
+                                <span className="bg-rose-600 text-white font-extrabold text-[8px] px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm flex items-center gap-0.5">
                                   🍗 NON-VEG
                                 </span>
                               )}
                             </div>
                             {/* Category Badge on Bottom-Left */}
-                            <div className="absolute bottom-2 left-2 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md text-slate-800 dark:text-slate-200 text-[8px] font-black px-2 py-0.5 rounded-full shadow-xs flex items-center gap-1">
-                              {item.category === 'Breakfast' ? '🌅' : item.category === 'Lunch' ? '☀️' : '🧁'} {item.category}
+                            <div className="absolute bottom-2 left-2 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md text-slate-800 dark:text-slate-200 text-[8px] font-extrabold px-2 py-0.5 rounded-full shadow-xs flex items-center gap-1 border border-slate-200/50 dark:border-slate-800">
+                              🧁 {item.category.toLowerCase()}
                             </div>
                           </div>
                           
-                          <h4 className="text-xs font-black text-slate-900 dark:text-white mt-2 line-clamp-1">{item.item_name}</h4>
+                          {/* Food Title */}
+                          <h4 className="text-xs font-black text-slate-900 dark:text-white mt-2.5 line-clamp-1">{item.item_name}</h4>
 
-                          {/* Hostel Name, Active Status & Stock */}
-                          <div className="mt-1 space-y-1">
-                            <p className="text-[9px] font-extrabold text-slate-500 dark:text-slate-400 truncate flex items-center gap-1">
-                              <span className="text-emerald-600">📍</span> {hostelName}
-                            </p>
-                            
-                            <div className="flex items-center justify-between text-[8px] font-black pt-0.5">
-                              <span className="text-emerald-600 dark:text-emerald-400 flex items-center gap-1 bg-emerald-50 dark:bg-emerald-950/80 px-1.5 py-0.5 rounded-md">
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                                Active
-                              </span>
-                              <span className="text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/80 px-1.5 py-0.5 rounded-md border border-amber-200/50 dark:border-amber-800/50">
-                                🔥 {stockRemaining} left
-                              </span>
-                            </div>
+                          {/* Location Pin & Hostel Name */}
+                          <p className="text-[10px] font-extrabold text-slate-500 dark:text-slate-400 truncate flex items-center gap-1 mt-1">
+                            <span className="text-rose-500">📍</span> {hostelName}
+                          </p>
+                          
+                          {/* Status & Stock Badges */}
+                          <div className="flex items-center gap-1.5 mt-1.5 text-[9px] font-extrabold">
+                            <span className="text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/80 px-2 py-0.5 rounded-full flex items-center gap-1 border border-emerald-100 dark:border-emerald-900">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                              Active
+                            </span>
+                            <span className="text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/80 px-2 py-0.5 rounded-full border border-amber-200/70 dark:border-amber-900/60 flex items-center gap-0.5">
+                              🔥 {stockRemaining} left
+                            </span>
                           </div>
                         </div>
 
-                        <div className="flex items-center justify-between mt-2.5 pt-2 border-t border-slate-100 dark:border-slate-800">
+                        {/* Price & Counter Stepper Row */}
+                        <div className="mt-3 pt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
                           <span className="text-sm font-black text-emerald-600 dark:text-emerald-400">₹{item.price}</span>
                           
                           {qty > 0 ? (
                             <div 
                               onClick={(e) => e.stopPropagation()}
-                              className="flex items-center gap-1 bg-emerald-50 dark:bg-emerald-950 text-emerald-900 dark:text-emerald-100 px-1.5 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800"
+                              className="bg-emerald-50 dark:bg-emerald-950/90 border border-emerald-200 dark:border-emerald-800/80 rounded-full px-2 py-0.5 flex items-center justify-between gap-1.5 shadow-xs transition-all"
                             >
                               <button 
+                                type="button"
                                 onClick={() => updateCartQty(item.id, -1)}
-                                className="w-4.5 h-4.5 bg-white dark:bg-slate-800 text-emerald-800 rounded-full flex items-center justify-center font-black text-xs hover:bg-emerald-100 active:scale-90"
+                                className="w-5 h-5 rounded-full text-emerald-800 dark:text-emerald-300 hover:bg-emerald-200/70 dark:hover:bg-emerald-900/80 flex items-center justify-center font-black text-xs active:scale-90 transition-all"
+                                title="Decrease quantity"
                               >
                                 -
                               </button>
-                              <span className="text-xs font-black px-1">{qty}</span>
+                              <span className="text-xs font-black text-emerald-900 dark:text-emerald-100 min-w-[14px] text-center">{qty}</span>
                               <button 
+                                type="button"
                                 onClick={() => updateCartQty(item.id, 1)}
-                                className="w-4.5 h-4.5 bg-emerald-600 text-white rounded-full flex items-center justify-center font-black text-xs hover:bg-emerald-700 active:scale-90"
+                                className="w-5 h-5 bg-emerald-600 text-white rounded-full flex items-center justify-center font-black text-xs hover:bg-emerald-700 shadow-xs active:scale-90 transition-all"
+                                title="Increase quantity"
                               >
                                 +
                               </button>
                             </div>
                           ) : (
                             <button
+                              type="button"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 toggleCartItem(item, 1);
                               }}
-                              className="w-7 h-7 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center font-black shadow-sm transition-all active:scale-90"
+                              className="w-8 h-8 rounded-full bg-emerald-600 hover:bg-emerald-700 active:scale-90 text-white flex items-center justify-center font-black shadow-md shadow-emerald-600/25 transition-all"
                               title="Add item to cart"
                             >
-                              <Plus className="w-3.5 h-3.5 stroke-[3px]" />
+                              <Plus className="w-4 h-4 stroke-[3px]" />
                             </button>
                           )}
                         </div>
@@ -950,11 +957,11 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
                       <div 
                         key={item.id} 
                         onClick={() => handleOpenMealDetail(item)}
-                        className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-3 shadow-xs hover:shadow-md transition-all cursor-pointer relative flex flex-col justify-between group"
+                        className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[1.75rem] p-3 shadow-xs hover:shadow-md transition-all cursor-pointer relative flex flex-col justify-between group"
                       >
                         <div>
                           {/* Image Box */}
-                          <div className="w-full h-32 rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800 relative">
+                          <div className="w-full h-32 rounded-[1.25rem] overflow-hidden bg-slate-100 dark:bg-slate-800 relative">
                             <img 
                               src={item.imageUrl} 
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
@@ -963,75 +970,79 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
                             {/* Top Left Veg/Non-Veg Badge */}
                             <div className="absolute top-2 left-2 z-10">
                               {isVeg ? (
-                                <span className="bg-emerald-600 text-white font-black text-[8px] px-2 py-0.5 rounded-full uppercase tracking-wider shadow-md flex items-center gap-0.5">
+                                <span className="bg-emerald-600 text-white font-extrabold text-[8px] px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm flex items-center gap-0.5">
                                   🌱 VEG
                                 </span>
                               ) : (
-                                <span className="bg-rose-600 text-white font-black text-[8px] px-2 py-0.5 rounded-full uppercase tracking-wider shadow-md flex items-center gap-0.5">
+                                <span className="bg-rose-600 text-white font-extrabold text-[8px] px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm flex items-center gap-0.5">
                                   🍗 NON-VEG
                                 </span>
                               )}
                             </div>
                             {/* Bottom Left Category Badge */}
-                            <div className="absolute bottom-2 left-2 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md text-slate-800 dark:text-slate-200 text-[8px] font-black px-2 py-0.5 rounded-full shadow-xs flex items-center gap-1">
-                              {item.category === 'Breakfast' ? '🌅' : item.category === 'Lunch' ? '☀️' : '🧁'} {item.category}
+                            <div className="absolute bottom-2 left-2 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md text-slate-800 dark:text-slate-200 text-[8px] font-extrabold px-2 py-0.5 rounded-full shadow-xs flex items-center gap-1 border border-slate-200/50 dark:border-slate-800">
+                              🧁 {item.category.toLowerCase()}
                             </div>
                           </div>
 
                           {/* Food Title */}
-                          <h4 className="text-xs font-black text-slate-900 dark:text-white mt-2 line-clamp-1">{item.item_name}</h4>
+                          <h4 className="text-xs font-black text-slate-900 dark:text-white mt-2.5 line-clamp-1">{item.item_name}</h4>
 
-                          {/* 1. Hostel Name, 2. Active Food Status, 3. Stock Count */}
-                          <div className="mt-1 space-y-1">
-                            <p className="text-[9px] font-extrabold text-slate-500 dark:text-slate-400 truncate flex items-center gap-1">
-                              <span className="text-emerald-600">📍</span> {hostelName}
-                            </p>
-                            
-                            <div className="flex items-center justify-between text-[8px] font-black pt-0.5">
-                              <span className="text-emerald-600 dark:text-emerald-400 flex items-center gap-1 bg-emerald-50 dark:bg-emerald-950/80 px-1.5 py-0.5 rounded-md">
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                                Active
-                              </span>
-                              <span className="text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/80 px-1.5 py-0.5 rounded-md border border-amber-200/50 dark:border-amber-800/50">
-                                🔥 {stockRemaining} left
-                              </span>
-                            </div>
+                          {/* Location Pin & Hostel Name */}
+                          <p className="text-[10px] font-extrabold text-slate-500 dark:text-slate-400 truncate flex items-center gap-1 mt-1">
+                            <span className="text-rose-500">📍</span> {hostelName}
+                          </p>
+                          
+                          {/* Status & Stock Badges */}
+                          <div className="flex items-center gap-1.5 mt-1.5 text-[9px] font-extrabold">
+                            <span className="text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/80 px-2 py-0.5 rounded-full flex items-center gap-1 border border-emerald-100 dark:border-emerald-900">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                              Active
+                            </span>
+                            <span className="text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/80 px-2 py-0.5 rounded-full border border-amber-200/70 dark:border-amber-900/60 flex items-center gap-0.5">
+                              🔥 {stockRemaining} left
+                            </span>
                           </div>
                         </div>
 
-                        {/* Price & Floating Green Plus Button */}
-                        <div className="mt-2.5 pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                        {/* Price & Counter Stepper Row */}
+                        <div className="mt-3 pt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
                           <span className="text-sm font-black text-emerald-600 dark:text-emerald-400">₹{item.price}</span>
 
                           {qty > 0 ? (
                             <div 
                               onClick={(e) => e.stopPropagation()}
-                              className="flex items-center gap-1 bg-emerald-50 dark:bg-emerald-950 text-emerald-900 dark:text-emerald-100 px-1.5 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800"
+                              className="bg-emerald-50 dark:bg-emerald-950/90 border border-emerald-200 dark:border-emerald-800/80 rounded-full px-2 py-0.5 flex items-center justify-between gap-1.5 shadow-xs transition-all"
                             >
                               <button 
+                                type="button"
                                 onClick={() => updateCartQty(item.id, -1)}
-                                className="w-4.5 h-4.5 bg-white dark:bg-slate-800 text-emerald-800 rounded-full flex items-center justify-center font-black text-xs hover:bg-emerald-100 active:scale-90"
+                                className="w-5 h-5 rounded-full text-emerald-800 dark:text-emerald-300 hover:bg-emerald-200/70 dark:hover:bg-emerald-900/80 flex items-center justify-center font-black text-xs active:scale-90 transition-all"
+                                title="Decrease quantity"
                               >
                                 -
                               </button>
-                              <span className="text-xs font-black px-1">{qty}</span>
+                              <span className="text-xs font-black text-emerald-900 dark:text-emerald-100 min-w-[14px] text-center">{qty}</span>
                               <button 
+                                type="button"
                                 onClick={() => updateCartQty(item.id, 1)}
-                                className="w-4.5 h-4.5 bg-emerald-600 text-white rounded-full flex items-center justify-center font-black text-xs hover:bg-emerald-700 active:scale-90"
+                                className="w-5 h-5 bg-emerald-600 text-white rounded-full flex items-center justify-center font-black text-xs hover:bg-emerald-700 shadow-xs active:scale-90 transition-all"
+                                title="Increase quantity"
                               >
                                 +
                               </button>
                             </div>
                           ) : (
                             <button
+                              type="button"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 toggleCartItem(item, 1);
                               }}
-                              className="w-7 h-7 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center font-black shadow-sm transition-all active:scale-90"
+                              className="w-8 h-8 rounded-full bg-emerald-600 hover:bg-emerald-700 active:scale-90 text-white flex items-center justify-center font-black shadow-md shadow-emerald-600/25 transition-all"
                               title="Add item to cart"
                             >
-                              <Plus className="w-3.5 h-3.5 stroke-[3px]" />
+                              <Plus className="w-4 h-4 stroke-[3px]" />
                             </button>
                           )}
                         </div>
