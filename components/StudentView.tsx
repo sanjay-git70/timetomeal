@@ -216,6 +216,7 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
   };
 
   const navigateTo = useCallback((tab: StudentTab) => {
+    setIsSettingsOpen(false);
     if (tab === activeTab) return;
     setTabHistory(prev => [...prev, activeTab]);
     setActiveTab(tab);
@@ -513,9 +514,9 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAF9] dark:bg-slate-950 text-gray-900 dark:text-slate-100 font-sans pb-32 transition-colors duration-300">
+    <div className={`bg-[#F8FAF9] dark:bg-slate-950 text-gray-900 dark:text-slate-100 font-sans transition-colors duration-300 ${activeTab === 'cart' ? 'h-screen h-[100dvh] overflow-hidden flex flex-col' : 'min-h-screen pb-32'}`}>
       {/* Upper header - Clean human-crafted layout */}
-      <header className="sticky top-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-b border-slate-100 dark:border-slate-800 px-5 py-3 flex justify-between items-center z-40 transition-colors duration-300">
+      <header className="sticky top-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-b border-slate-100 dark:border-slate-800 px-5 py-3 flex justify-between items-center z-40 transition-colors duration-300 shrink-0">
         <div className="flex items-center gap-3">
           {activeTab !== 'home' ? (
             <button 
@@ -1225,10 +1226,10 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
 
         {/* BASKET / CHECKOUT WIZARD VIEW */}
         {activeTab === 'cart' && (
-          <div className="px-6 pt-4 animate-in duration-500">
+          <div className="flex-1 flex flex-col min-h-0 px-6 pt-4 max-w-2xl mx-auto w-full animate-in duration-500 overflow-hidden">
             {checkoutStep === 'basket' && (
-              <div className="space-y-6 animate-in slide-in-from-bottom-4">
-                <div className="flex justify-between items-end">
+              <div className="flex-1 flex flex-col min-h-0 space-y-3 animate-in slide-in-from-bottom-4">
+                <div className="flex justify-between items-end shrink-0 pb-1">
                   <div>
                     <h3 className="text-xl font-black text-gray-950 dark:text-white tracking-tight">Your Cart</h3>
                     <p className="text-[9px] text-gray-400 dark:text-slate-400 font-bold uppercase tracking-widest mt-0.5">Review selected meals</p>
@@ -1244,13 +1245,13 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
                 </div>
 
                 {cart.length === 0 ? (
-                  <div className="py-20 text-center bg-white border border-gray-100 rounded-[2.5rem] flex flex-col items-center justify-center gap-4">
-                    <div className="w-16 h-16 bg-slate-50 text-slate-200 rounded-full flex items-center justify-center">
+                  <div className="flex-1 flex flex-col items-center justify-center text-center bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-[2.5rem] p-6 gap-4 my-auto">
+                    <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800 text-slate-200 dark:text-slate-700 rounded-full flex items-center justify-center">
                       <ShoppingBag className="w-8 h-8" />
                     </div>
                     <div>
-                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Your Cart is Empty</p>
-                      <p className="text-[9px] font-bold text-gray-300 uppercase tracking-widest mt-1">Select some hot meals to start booking.</p>
+                      <p className="text-[10px] font-black text-gray-400 dark:text-slate-400 uppercase tracking-widest">Your Cart is Empty</p>
+                      <p className="text-[9px] font-bold text-gray-300 dark:text-slate-500 uppercase tracking-widest mt-1">Select some hot meals to start booking.</p>
                     </div>
                     <button
                       onClick={() => setActiveTab('home')}
@@ -1261,8 +1262,8 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
                   </div>
                 ) : (
                   <>
-                    {/* Add More Items Button */}
-                    <div className="flex justify-between items-center">
+                    {/* Fixed Order Items Header */}
+                    <div className="flex justify-between items-center shrink-0 py-1">
                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Order Items</p>
                       <button 
                         onClick={() => setActiveTab('home')}
@@ -1272,91 +1273,97 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
                       </button>
                     </div>
 
-                    {/* Cart Items List */}
-                    <div className="space-y-3">
-                      {cart.map(item => {
-                        const menuItem = menu.find(m => m.id === item.menu_item_id);
-                        return (
-                          <div key={item.menu_item_id} className="bg-white p-4 rounded-3xl border border-gray-100 shadow-sm flex items-center gap-4 justify-between group">
-                            <div className="flex items-center gap-4 min-w-0">
-                              <div className="w-14 h-14 bg-gray-50 rounded-2xl overflow-hidden shrink-0 border border-gray-100">
-                                <img src={menuItem?.imageUrl} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                    {/* Vertically Scrollable Order Items & Verification Policy Section */}
+                    <div className="flex-1 overflow-y-auto min-h-0 scroll-smooth space-y-3 pr-1 pb-2">
+                      {/* Cart Items List */}
+                      <div className="space-y-3">
+                        {cart.map(item => {
+                          const menuItem = menu.find(m => m.id === item.menu_item_id);
+                          return (
+                            <div key={item.menu_item_id} className="bg-white dark:bg-slate-900 p-4 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm flex items-center gap-4 justify-between group">
+                              <div className="flex items-center gap-4 min-w-0">
+                                <div className="w-14 h-14 bg-gray-50 dark:bg-slate-800 rounded-2xl overflow-hidden shrink-0 border border-gray-100 dark:border-slate-800">
+                                  <img src={menuItem?.imageUrl} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                                </div>
+                                <div className="min-w-0">
+                                  <h4 className="font-black text-slate-900 dark:text-white text-xs truncate leading-snug">{item.item_name}</h4>
+                                  <p className="text-emerald-600 dark:text-emerald-400 font-black text-sm mt-0.5">₹{item.price}</p>
+                                </div>
                               </div>
-                              <div className="min-w-0">
-                                <h4 className="font-black text-slate-900 text-xs truncate leading-snug">{item.item_name}</h4>
-                                <p className="text-emerald-600 font-black text-sm mt-0.5">₹{item.price}</p>
+
+                              {/* Quantity buttons */}
+                              <div className="flex items-center gap-3">
+                                <div className="flex items-center bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700 p-1">
+                                  <button 
+                                    onClick={() => updateCartQty(item.menu_item_id, -1)}
+                                    className="w-7 h-7 bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-600 active:scale-90 shadow-sm"
+                                  >
+                                    <Minus className="w-3.5 h-3.5" />
+                                  </button>
+                                  <span className="px-3 text-xs font-black text-slate-900 dark:text-white">{item.quantity}</span>
+                                  <button 
+                                    onClick={() => updateCartQty(item.menu_item_id, 1)}
+                                    className="w-7 h-7 bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-600 active:scale-90 shadow-sm"
+                                  >
+                                    <PlusIcon className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
+
+                                <button 
+                                  onClick={() => removeCartItem(item.menu_item_id)}
+                                  className="w-9 h-9 text-slate-300 dark:text-slate-600 hover:text-red-500 rounded-xl flex items-center justify-center hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
                               </div>
                             </div>
-
-                            {/* Quantity buttons */}
-                            <div className="flex items-center gap-3">
-                              <div className="flex items-center bg-slate-50 rounded-xl border border-slate-100 p-1">
-                                <button 
-                                  onClick={() => updateCartQty(item.menu_item_id, -1)}
-                                  className="w-7 h-7 bg-white text-slate-700 rounded-lg flex items-center justify-center hover:bg-slate-100 active:scale-90 shadow-sm"
-                                >
-                                  <Minus className="w-3.5 h-3.5" />
-                                </button>
-                                <span className="px-3 text-xs font-black text-slate-900">{item.quantity}</span>
-                                <button 
-                                  onClick={() => updateCartQty(item.menu_item_id, 1)}
-                                  className="w-7 h-7 bg-white text-slate-700 rounded-lg flex items-center justify-center hover:bg-slate-100 active:scale-90 shadow-sm"
-                                >
-                                  <PlusIcon className="w-3.5 h-3.5" />
-                                </button>
-                              </div>
-
-                              <button 
-                                onClick={() => removeCartItem(item.menu_item_id)}
-                                className="w-9 h-9 text-slate-300 hover:text-red-500 rounded-xl flex items-center justify-center hover:bg-red-50 transition-colors"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </button>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-
-                    {/* Pre-order terms warning */}
-                    <div className="bg-amber-50 p-5 rounded-3xl border border-amber-100/50 flex gap-3.5">
-                      <div className="w-9 h-9 bg-white text-amber-600 rounded-2xl flex items-center justify-center shrink-0 shadow-sm">
-                        <Info className="w-4 h-4" />
+                          );
+                        })}
                       </div>
-                      <div>
-                        <p className="text-[9px] font-black text-amber-800 uppercase tracking-widest">Verification policy</p>
-                        <p className="text-[10px] font-bold text-amber-950 leading-relaxed mt-0.5">
-                          Payments require manual counter verification. You will be asked to slide to authorize half-amount up-front.
-                        </p>
+
+                      {/* Verification policy card */}
+                      <div className="bg-amber-50 dark:bg-amber-950/40 p-5 rounded-3xl border border-amber-100/50 dark:border-amber-900/40 flex gap-3.5">
+                        <div className="w-9 h-9 bg-white dark:bg-slate-900 text-amber-600 dark:text-amber-400 rounded-2xl flex items-center justify-center shrink-0 shadow-sm">
+                          <Info className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <p className="text-[9px] font-black text-amber-800 dark:text-amber-300 uppercase tracking-widest">Verification policy</p>
+                          <p className="text-[10px] font-bold text-amber-950 dark:text-amber-200 leading-relaxed mt-0.5">
+                            Payments require manual counter verification. You will be asked to slide to authorize half-amount up-front.
+                          </p>
+                        </div>
                       </div>
                     </div>
 
-                    {/* Cost summary card */}
-                    <div className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm space-y-4">
-                       <div className="flex justify-between items-center">
-                          <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Basket Items Total</span>
-                          <span className="font-black text-gray-950 text-sm">₹{total}</span>
-                       </div>
-                       <div className="h-px bg-gray-50" />
-                       <div className="flex justify-between items-center">
-                          <span className="text-sm font-black text-gray-950 tracking-tight">Total Payable</span>
-                          <span className="text-2xl font-black text-emerald-600 tracking-tighter">₹{total}</span>
-                       </div>
-                    </div>
+                    {/* Fixed Bottom Section (Cost Summary & Checkout Button) */}
+                    <div className="shrink-0 pt-2 pb-20 sm:pb-24 space-y-3 bg-[#F8FAF9] dark:bg-slate-950">
+                      {/* Cost summary card */}
+                      <div className="bg-white dark:bg-slate-900 p-5 rounded-[2rem] border border-gray-100 dark:border-slate-800 shadow-sm space-y-3">
+                         <div className="flex justify-between items-center">
+                            <span className="text-[9px] font-black text-gray-400 dark:text-slate-400 uppercase tracking-widest">Basket Items Total</span>
+                            <span className="font-black text-gray-950 dark:text-white text-sm">₹{total}</span>
+                         </div>
+                         <div className="h-px bg-gray-50 dark:bg-slate-800" />
+                         <div className="flex justify-between items-center">
+                            <span className="text-sm font-black text-gray-950 dark:text-white tracking-tight">Total Payable</span>
+                            <span className="text-2xl font-black text-emerald-600 dark:text-emerald-400 tracking-tighter">₹{total}</span>
+                         </div>
+                      </div>
 
-                    <button 
-                      onClick={() => setCheckoutStep('billing')}
-                      className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-lg shadow-emerald-100 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
-                    >
-                      To Billing & Details <ArrowRight className="w-4 h-4" />
-                    </button>
+                      <button 
+                        onClick={() => setCheckoutStep('billing')}
+                        className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-lg shadow-emerald-100 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                      >
+                        To Billing & Details <ArrowRight className="w-4 h-4" />
+                      </button>
+                    </div>
                   </>
                 )}
               </div>
             )}
 
             {checkoutStep === 'billing' && (
-              <div className="space-y-6 animate-in slide-in-from-right-4">
+              <div className="flex-1 flex flex-col min-h-0 space-y-6 animate-in slide-in-from-right-4 overflow-y-auto pb-24 pr-1">
                 <div className="flex items-center justify-between mb-4">
                   <button onClick={() => setCheckoutStep('basket')} className="w-10 h-10 rounded-xl bg-white border border-gray-100 flex items-center justify-center text-slate-500 shadow-sm">
                     <ChevronLeft className="w-5 h-5" />
@@ -1859,58 +1866,56 @@ const StudentView: React.FC<StudentViewProps> = ({ user, orders, menu, onUpdateO
         </div>
       )}
 
-      {/* Floating Bottom Navigation Bar - Exactly like reference mockup */}
-      {activeTab !== 'settings' && !isSettingsOpen && (
-        <nav className="fixed bottom-3 left-1/2 -translate-x-1/2 w-[92%] max-w-xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800 rounded-full py-2 px-3 shadow-xl flex items-center justify-around z-40 transition-colors duration-300">
-          {[
-            { tab: 'home', icon: <Home className="w-5 h-5" />, label: 'Home' },
-            { tab: 'orders', icon: <Utensils className="w-5 h-5" />, label: 'Order' },
-            { tab: 'cart', icon: <ShoppingCart className="w-5 h-5" />, label: 'Cart' },
-            { tab: 'settings', icon: <Settings className="w-5 h-5" />, label: 'Settings' }
-          ].map((item) => {
-            const isActive = activeTab === item.tab;
-            const totalCartItems = cart.reduce((sum, i) => sum + i.quantity, 0);
+      {/* Floating Bottom Navigation Bar - Displayed on all tabs including Settings */}
+      <nav className="fixed bottom-3 left-1/2 -translate-x-1/2 w-[92%] max-w-xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800 rounded-full py-2 px-3 shadow-xl flex items-center justify-around z-[60] transition-colors duration-300">
+        {[
+          { tab: 'home', icon: <Home className="w-5 h-5" />, label: 'Home' },
+          { tab: 'orders', icon: <Utensils className="w-5 h-5" />, label: 'Order' },
+          { tab: 'cart', icon: <ShoppingCart className="w-5 h-5" />, label: 'Cart' },
+          { tab: 'settings', icon: <Settings className="w-5 h-5" />, label: 'Settings' }
+        ].map((item) => {
+          const isActive = activeTab === item.tab || (item.tab === 'settings' && isSettingsOpen);
+          const totalCartItems = cart.reduce((sum, i) => sum + i.quantity, 0);
 
-            if (isActive) {
-              return (
-                <button
-                  key={item.tab}
-                  onClick={() => navigateTo(item.tab as StudentTab)}
-                  className="bg-emerald-100/90 dark:bg-emerald-950/90 text-emerald-700 dark:text-emerald-300 font-extrabold px-4 py-2 rounded-full flex items-center gap-2 transition-all shadow-sm"
-                >
-                  <div className="relative">
-                    {item.icon}
-                    {item.tab === 'cart' && totalCartItems > 0 && (
-                      <span className="absolute -top-1.5 -right-2 bg-emerald-600 text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center">
-                        {totalCartItems}
-                      </span>
-                    )}
-                  </div>
-                  <span className="text-xs font-black capitalize tracking-tight">{item.label}</span>
-                </button>
-              );
-            }
-
+          if (isActive) {
             return (
               <button
                 key={item.tab}
                 onClick={() => navigateTo(item.tab as StudentTab)}
-                className="flex flex-col items-center justify-center gap-0.5 relative py-1 px-3 text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
+                className="bg-emerald-100/90 dark:bg-emerald-950/90 text-emerald-700 dark:text-emerald-300 font-extrabold px-4 py-2 rounded-full flex items-center gap-2 transition-all shadow-sm"
               >
                 <div className="relative">
                   {item.icon}
                   {item.tab === 'cart' && totalCartItems > 0 && (
-                    <span className="absolute -top-1.5 -right-2 bg-emerald-600 text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-sm">
+                    <span className="absolute -top-1.5 -right-2 bg-emerald-600 text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center">
                       {totalCartItems}
                     </span>
                   )}
                 </div>
-                <span className="text-[9px] font-bold tracking-tight capitalize mt-0.5">{item.label}</span>
+                <span className="text-xs font-black capitalize tracking-tight">{item.label}</span>
               </button>
             );
-          })}
-        </nav>
-      )}
+          }
+
+          return (
+            <button
+              key={item.tab}
+              onClick={() => navigateTo(item.tab as StudentTab)}
+              className="flex flex-col items-center justify-center gap-0.5 relative py-1 px-3 text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
+            >
+              <div className="relative">
+                {item.icon}
+                {item.tab === 'cart' && totalCartItems > 0 && (
+                  <span className="absolute -top-1.5 -right-2 bg-emerald-600 text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-sm">
+                    {totalCartItems}
+                  </span>
+                )}
+              </div>
+              <span className="text-[9px] font-bold tracking-tight capitalize mt-0.5">{item.label}</span>
+            </button>
+          );
+        })}
+      </nav>
 
       {/* Popups and Modals */}
       {showPlacedPopup && (

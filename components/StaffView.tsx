@@ -12,7 +12,8 @@ import {
   Edit2, ShoppingCart, ArrowLeft, RotateCw, X as XIcon, User as UserIcon,
   BarChart3, Store, Phone, Mail, Save, ToggleLeft as Toggle,
   Clock as ClockIcon, CreditCard, Monitor, AlertCircle, ChevronRight, CheckCircle2,
-  Tv2
+  Tv2, Bell, Sun, Moon, Shield, Lock, ChevronLeft, PanelLeft, PanelLeftClose,
+  FileText, HelpCircle, Terminal, TrendingUp
 } from 'lucide-react';
 
 interface StaffViewProps {
@@ -27,11 +28,14 @@ interface StaffViewProps {
 type StaffTab = 'summary' | 'orders' | 'inventory' | 'reports' | 'profile' | 'walk-in-order' | 'tv-view';
 
 const StaffView: React.FC<StaffViewProps> = ({ user, orders, menu, onUpdateOrders, onUpdateMenu, onLogout }) => {
-  const [activeTab, setActiveTab] = useState<StaffTab>('summary');
+  const [activeTab, setActiveTab] = useState<StaffTab>('profile');
   const [tabHistory, setTabHistory] = useState<StaffTab[]>([]);
   const [refreshKey, setRefreshKey] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
-  
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [showToast, setShowToast] = useState<string | null>(null);
+
   // Inventory Edit State
   const [isAddingItem, setIsAddingItem] = useState(false);
   const [newItem, setNewItem] = useState<Partial<MenuItem>>({
@@ -60,6 +64,11 @@ const StaffView: React.FC<StaffViewProps> = ({ user, orders, menu, onUpdateOrder
     setActiveTab(previous);
   }, [tabHistory]);
 
+  const triggerToast = (msg: string) => {
+    setShowToast(msg);
+    setTimeout(() => setShowToast(null), 3000);
+  };
+
   // Keyboard Shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -67,6 +76,7 @@ const StaffView: React.FC<StaffViewProps> = ({ user, orders, menu, onUpdateOrder
       if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) return;
       if (e.key === 'Tab') { e.preventDefault(); navigateTo('walk-in-order'); }
       if (e.key === 'Escape') { e.preventDefault(); goBack(); }
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') { e.preventDefault(); setIsSidebarOpen(prev => !prev); }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
@@ -116,394 +126,564 @@ const StaffView: React.FC<StaffViewProps> = ({ user, orders, menu, onUpdateOrder
     return <TVDashboard orders={orders} onBack={goBack} />;
   }
 
+  const navItems = [
+    { id: 'summary', icon: LayoutDashboard, label: 'Dashboard' },
+    { id: 'walk-in-order', icon: FileText, label: 'New Bill' },
+    { id: 'orders', icon: ClockIcon, label: 'Live Queue' },
+    { id: 'inventory', icon: UtensilsCrossed, label: 'Menu Catalog' },
+    { id: 'reports', icon: BarChart3, label: 'Financials' },
+    { id: 'profile', icon: Settings, label: 'Configuration' }
+  ];
+
   return (
-    <div key={refreshKey} className="flex flex-col lg:flex-row min-h-[calc(100vh-80px)] bg-gray-50 text-gray-900 animate-in fade-in duration-700">
-      <aside className="w-full lg:w-72 bg-white border-r border-gray-200 p-6 flex flex-col gap-2 shrink-0 print:hidden shadow-sm">
-        <div className="p-4 mb-6 bg-gray-950 rounded-[2.5rem] text-white shadow-xl shadow-gray-200">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-emerald-600 rounded-2xl flex items-center justify-center font-black text-gray-950 shadow-inner">
-              {canteenProfile?.canteen_name?.[0] || 'C'}
+    <div key={refreshKey} className={`min-h-screen flex bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-300 font-sans ${isDarkMode ? 'dark' : ''}`}>
+      
+      {/* Toast Notification */}
+      {showToast && (
+        <div className="fixed top-5 right-5 z-[200] bg-emerald-600 text-white font-bold text-xs px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-2 animate-in slide-in-from-top-4 duration-300">
+          <CheckCircle2 className="w-4 h-4" /> {showToast}
+        </div>
+      )}
+
+      {/* Dark Emerald Sidebar with Collapsible Open/Close Mechanism */}
+      <aside 
+        className={`bg-[#031B15] text-slate-200 border-r border-[#0A3328] flex flex-col justify-between shrink-0 transition-all duration-300 ease-in-out z-40 fixed lg:relative inset-y-0 left-0 ${
+          isSidebarOpen ? 'w-64' : 'w-20'
+        }`}
+      >
+        <div>
+          {/* Brand Header & Collapse Toggle */}
+          <div className="p-4 border-b border-[#0A3328]/80 flex items-center justify-between">
+            <div className="flex items-center gap-3 overflow-hidden">
+              <div className="w-10 h-10 rounded-full bg-emerald-500 text-[#031B15] font-black flex items-center justify-center text-lg shrink-0 shadow-lg shadow-emerald-500/20">
+                T
+              </div>
+              {isSidebarOpen && (
+                <div className="flex flex-col whitespace-nowrap">
+                  <span className="font-extrabold text-base tracking-tight text-white leading-none">TimeToMeal</span>
+                  <span className="text-[9px] font-black text-emerald-400 uppercase tracking-widest mt-1">ADMIN PORTAL</span>
+                </div>
+              )}
             </div>
-            <div className="overflow-hidden">
-              <p className="font-black text-sm truncate uppercase tracking-widest">{canteenProfile?.canteen_name || 'My Canteen'}</p>
-              <p className="text-[10px] text-emerald-500 font-bold uppercase tracking-widest">Administrator</p>
+
+            {/* Sidebar Open/Close Toggle Button */}
+            <button 
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)} 
+              title={isSidebarOpen ? "Close Sidebar (Ctrl+B)" : "Open Sidebar (Ctrl+B)"}
+              className="p-1.5 rounded-xl hover:bg-[#072c22] text-emerald-400/80 hover:text-emerald-300 transition-all ml-auto shrink-0"
+            >
+              {isSidebarOpen ? <PanelLeftClose className="w-5 h-5" /> : <PanelLeft className="w-5 h-5" />}
+            </button>
+          </div>
+
+          {/* Main Navigation Items */}
+          <nav className="p-3 space-y-1 mt-2">
+            {navItems.map((item) => {
+              const isActive = activeTab === item.id;
+              const Icon = item.icon;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => navigateTo(item.id as StaffTab)}
+                  title={!isSidebarOpen ? item.label : undefined}
+                  className={`w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-bold text-xs transition-all group ${
+                    isActive 
+                      ? 'bg-[#009E60] text-white shadow-lg shadow-[#009E60]/25' 
+                      : 'text-slate-400 hover:text-white hover:bg-[#072c22]'
+                  } ${!isSidebarOpen ? 'justify-center px-0' : ''}`}
+                >
+                  <Icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-white' : 'text-slate-400 group-hover:text-emerald-400'}`} />
+                  {isSidebarOpen && <span className="truncate">{item.label}</span>}
+                </button>
+              );
+            })}
+          </nav>
+
+          {/* Quick Actions Section */}
+          <div className="px-3 pt-6">
+            {isSidebarOpen && (
+              <p className="px-3 text-[10px] font-black text-emerald-500/70 uppercase tracking-widest mb-2">
+                QUICK ACTIONS
+              </p>
+            )}
+            <div className="space-y-1">
+              <button 
+                onClick={() => navigateTo('tv-view')}
+                title={!isSidebarOpen ? "Launch TV Panel" : undefined}
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-[#072c22] transition-all ${!isSidebarOpen ? 'justify-center px-0' : ''}`}
+              >
+                <Tv2 className="w-4 h-4 text-emerald-400/80 shrink-0" />
+                {isSidebarOpen && <span>Launch TV Panel</span>}
+              </button>
+              <button 
+                onClick={() => triggerToast("Printing Diagnostic Hardware Test Slip...")}
+                title={!isSidebarOpen ? "Print Test" : undefined}
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-[#072c22] transition-all ${!isSidebarOpen ? 'justify-center px-0' : ''}`}
+              >
+                <Printer className="w-4 h-4 text-emerald-400/80 shrink-0" />
+                {isSidebarOpen && <span>Print Test</span>}
+              </button>
+              <button 
+                onClick={() => triggerToast("All hardware ports & services active (COM4 115200 Baud)")}
+                title={!isSidebarOpen ? "System Logs" : undefined}
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-[#072c22] transition-all ${!isSidebarOpen ? 'justify-center px-0' : ''}`}
+              >
+                <Terminal className="w-4 h-4 text-emerald-400/80 shrink-0" />
+                {isSidebarOpen && <span>System Logs</span>}
+              </button>
+              <button 
+                onClick={() => triggerToast("TimeToMeal Support Hotline: +91 98765 43210")}
+                title={!isSidebarOpen ? "Help & Support" : undefined}
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-[#072c22] transition-all ${!isSidebarOpen ? 'justify-center px-0' : ''}`}
+              >
+                <HelpCircle className="w-4 h-4 text-emerald-400/80 shrink-0" />
+                {isSidebarOpen && <span>Help & Support</span>}
+              </button>
             </div>
           </div>
         </div>
 
-        {[
-          { id: 'summary', icon: LayoutDashboard, label: 'Summary' },
-          { id: 'walk-in-order', icon: ShoppingCart, label: 'New Bill' },
-          { id: 'orders', icon: ClockIcon, label: 'Live Queue' },
-          { id: 'inventory', icon: UtensilsCrossed, label: 'Menu Catalog' },
-          { id: 'reports', icon: BarChart3, label: 'Financials' },
-          { id: 'profile', icon: Settings, label: 'Configuration' }
-        ].map(tab => (
-          <button 
-            key={tab.id}
-            onClick={() => navigateTo(tab.id as StaffTab)}
-            className={`flex items-center gap-4 px-6 py-4 rounded-[1.5rem] font-black text-[11px] uppercase tracking-widest transition-all ${
-              activeTab === tab.id 
-                ? 'bg-emerald-600 text-white shadow-xl shadow-emerald-200' 
-                : 'text-gray-400 hover:bg-emerald-50 hover:text-emerald-700'
-            }`}
-          >
-            <tab.icon className="w-5 h-5" /> {tab.label}
-          </button>
-        ))}
-
-        <div className="mt-auto pt-4 border-t border-gray-100">
-           <button 
-            onClick={() => navigateTo('tv-view')}
-            className="w-full flex items-center gap-4 px-6 py-4 rounded-[1.5rem] font-black text-[11px] uppercase tracking-widest text-blue-600 hover:bg-blue-50 transition-all"
-           >
-            <Tv2 className="w-5 h-5" /> Launch TV Panel
-           </button>
-           <button onClick={onLogout} className="w-full flex items-center gap-4 px-6 py-4 rounded-[1.5rem] font-black text-[11px] uppercase tracking-widest text-red-400 hover:bg-red-50 hover:text-red-600 transition-all mt-2">
-            <LogOut className="w-5 h-5" /> Sign Out
-           </button>
+        {/* Staff Account Info at Bottom */}
+        <div className="p-3 border-t border-[#0A3328]/80">
+          <div className={`p-2.5 bg-[#05261d] rounded-2xl flex items-center justify-between border border-[#0B3A2E] ${!isSidebarOpen ? 'justify-center p-2' : ''}`}>
+            <div className="flex items-center gap-3 overflow-hidden">
+              <div className="w-9 h-9 rounded-full bg-emerald-600 text-white font-black flex items-center justify-center text-sm shrink-0">
+                S
+              </div>
+              {isSidebarOpen && (
+                <div className="overflow-hidden">
+                  <p className="font-extrabold text-xs text-white truncate leading-tight">Staff Account</p>
+                  <p className="text-[10px] text-emerald-400/80 truncate">{user.email}</p>
+                </div>
+              )}
+            </div>
+            {isSidebarOpen && (
+              <button onClick={onLogout} title="Sign Out" className="p-1.5 text-slate-400 hover:text-red-400 hover:bg-red-950/30 rounded-xl transition-all">
+                <LogOut className="w-4 h-4" />
+              </button>
+            )}
+          </div>
         </div>
       </aside>
 
-      <main className="flex-1 p-4 md:p-10 overflow-y-auto">
-        {/* Header & Search */}
-        <div className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6 print:hidden">
-          <div className="flex items-center gap-6">
+      {/* Main Right Content Panel */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
+        
+        {/* Top Header Navigation Bar */}
+        <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-6 py-4 flex items-center justify-between sticky top-0 z-30 shadow-xs">
+          <div className="flex items-center gap-4">
+            {/* Open/Close Sidebar Toggle button for mobile / top header */}
+            <button 
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)} 
+              className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition-all"
+              title="Toggle Sidebar Menu"
+            >
+              <PanelLeft className="w-5 h-5" />
+            </button>
+
             {tabHistory.length > 0 && (
-              <button onClick={goBack} className="p-3 bg-white border border-gray-100 rounded-2xl text-gray-400 hover:text-gray-950 transition-all shadow-sm group">
-                <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+              <button 
+                onClick={goBack} 
+                className="p-2 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white transition-all"
+              >
+                <ArrowLeft className="w-4 h-4" />
               </button>
             )}
+
             <div>
-              <h2 className="text-4xl font-black text-gray-950 tracking-tight capitalize">
-                {activeTab === 'profile' ? 'Portal Setup' : (activeTab === 'orders' ? 'Live Queue' : (activeTab === 'inventory' ? 'Menu Catalog' : activeTab.replace('-', ' ')))}
-              </h2>
-              <p className="text-[10px] font-black text-emerald-600 uppercase tracking-[0.4em] mt-1">{canteenProfile.canteen_name} Control Unit</p>
+              <h1 className="text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+                {activeTab === 'profile' ? 'Portal Setup' : (activeTab === 'orders' ? 'Live Queue' : (activeTab === 'inventory' ? 'Menu Catalog' : (activeTab === 'reports' ? 'Financials' : activeTab.replace('-', ' '))))}
+              </h1>
+              <p className="text-xs text-emerald-600 dark:text-emerald-400 font-bold">
+                {canteenProfile?.canteen_name || 'TimeToMeal Main Canteen'} Control Unit
+              </p>
             </div>
           </div>
-          {(activeTab === 'orders' || activeTab === 'inventory') && (
-            <div className="relative w-full md:w-96 group">
-              <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-300 w-5 h-5 group-focus-within:text-emerald-500 transition-colors" />
-              <input 
-                value={searchTerm}
-                onChange={e => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-6 py-4 bg-white border border-gray-100 rounded-[1.5rem] outline-none font-bold text-sm focus:ring-4 focus:ring-emerald-500/10 shadow-sm transition-all"
-                placeholder={activeTab === 'orders' ? "Search Token ID or Name..." : "Search Menu Items..."}
-              />
-            </div>
-          )}
-        </div>
 
-        {activeTab === 'summary' && <SummaryDashboard orders={orders} onNewWalkIn={() => navigateTo('walk-in-order')} />}
-        
-        {activeTab === 'orders' && (
-          <div className="grid grid-cols-1 gap-6 animate-in slide-in-from-right-4 duration-500">
-             {filteredOrders.length === 0 ? (
-               <div className="py-40 text-center text-gray-300 flex flex-col items-center gap-4">
-                  <Package className="w-16 h-16 opacity-10" />
-                  <p className="font-black uppercase tracking-widest text-[10px]">No active orders found in queue</p>
-               </div>
-             ) : (
-               filteredOrders.map(order => (
-                 <div key={order.id} className="bg-white p-8 rounded-[3rem] border border-gray-100 shadow-sm flex flex-col md:flex-row justify-between gap-8 hover:border-emerald-100 transition-all">
-                    <div className="flex-1 space-y-6">
-                       <div className="flex items-center gap-5">
-                          <div className="px-5 py-3 bg-gray-950 text-emerald-500 rounded-2xl font-black text-2xl tracking-tighter">
-                             #{order.order_code}
+          {/* Right Status Controls */}
+          <div className="flex items-center gap-3">
+            <div className="px-3.5 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span className="text-xs font-extrabold text-emerald-700 dark:text-emerald-300">System Online</span>
+            </div>
+
+            <button 
+              onClick={() => triggerToast("3 New walk-in orders received")}
+              className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition-all relative"
+            >
+              <Bell className="w-4 h-4" />
+              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-emerald-600 text-white font-black text-[9px] flex items-center justify-center border-2 border-white dark:border-slate-900">
+                3
+              </span>
+            </button>
+
+            <button 
+              onClick={() => setIsDarkMode(!isDarkMode)} 
+              className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition-all"
+            >
+              {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </button>
+          </div>
+        </header>
+
+        {/* Content Views */}
+        <main className="p-6 lg:p-8 space-y-8 flex-1">
+          {activeTab === 'summary' && <SummaryDashboard orders={orders} onNewWalkIn={() => navigateTo('walk-in-order')} menu={menu} />}
+
+          {activeTab === 'orders' && (
+            <div className="space-y-6">
+              <div className="flex items-center justify-between gap-4">
+                <div className="relative flex-1 max-w-md">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
+                  <input 
+                    value={searchTerm}
+                    onChange={e => setSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl outline-none text-xs font-bold"
+                    placeholder="Search Token ID or Name..."
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4">
+                {filteredOrders.length === 0 ? (
+                  <div className="py-24 text-center text-slate-400 flex flex-col items-center gap-3">
+                    <Package className="w-12 h-12 opacity-20" />
+                    <p className="font-bold text-xs">No active orders found in queue</p>
+                  </div>
+                ) : (
+                  filteredOrders.map(order => (
+                    <div key={order.id} className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col md:flex-row justify-between gap-6">
+                      <div className="flex-1 space-y-4">
+                        <div className="flex items-center gap-4">
+                          <div className="px-4 py-2 bg-slate-950 text-emerald-400 rounded-2xl font-black text-xl">
+                            #{order.order_code}
                           </div>
                           <div>
-                             <h4 className="font-black text-xl text-gray-950 leading-tight">{order.student_details?.full_name || 'Walk-in Counter Guest'}</h4>
-                             <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1 flex items-center gap-2">
-                                <ClockIcon className="w-3 h-3" /> {new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                             </p>
+                            <h4 className="font-bold text-base text-slate-900 dark:text-white">{order.student_details?.full_name || 'Walk-in Counter Guest'}</h4>
+                            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider flex items-center gap-1.5 mt-0.5">
+                              <ClockIcon className="w-3 h-3" /> {new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </p>
                           </div>
-                       </div>
-                       <div className="bg-gray-50/50 p-6 rounded-[2rem] grid grid-cols-1 md:grid-cols-2 gap-4 border border-gray-100">
+                        </div>
+                        <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl grid grid-cols-1 md:grid-cols-2 gap-2 border border-slate-100 dark:border-slate-800">
                           {order.order_items?.map((item, idx) => (
-                            <div key={idx} className="flex justify-between text-xs font-bold border-b border-gray-100 pb-2 last:border-0 last:pb-0">
-                               <span className="text-gray-600">{item.quantity}x {item.item_name}</span>
-                               <span className="text-gray-400">₹{item.price * item.quantity}</span>
+                            <div key={idx} className="flex justify-between text-xs font-bold py-1 border-b border-slate-100 dark:border-slate-800/60 last:border-0">
+                              <span className="text-slate-700 dark:text-slate-300">{item.quantity}x {item.item_name}</span>
+                              <span className="text-slate-400">₹{item.price * item.quantity}</span>
                             </div>
                           ))}
-                       </div>
-                    </div>
-                    <div className="flex flex-col justify-between items-end gap-6 min-w-[240px]">
-                       <div className="text-right">
-                          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Total Billable</p>
-                          <p className="text-4xl font-black text-gray-950 tracking-tighter">₹{order.total_amount}</p>
-                          <div className={`mt-2 inline-flex items-center gap-2 px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest ${order.order_status === 'ready' ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-400'}`}>
-                             {order.order_status}
-                          </div>
-                       </div>
-                       <div className="flex flex-wrap gap-3 justify-end w-full">
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col justify-between items-end gap-4 min-w-[200px]">
+                        <div className="text-right">
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Billable</p>
+                          <p className="text-3xl font-black text-slate-900 dark:text-white">₹{order.total_amount}</p>
+                          <span className={`inline-block mt-1 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider ${
+                            order.order_status === 'ready' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'
+                          }`}>
+                            {order.order_status}
+                          </span>
+                        </div>
+
+                        <div className="flex gap-2 w-full justify-end">
                           {order.order_status === 'pending' && (
-                            <button onClick={() => updateOrderStatus(order.id, 'preparing')} className="flex-1 flex items-center justify-center gap-3 px-8 py-4 bg-blue-600 text-white rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-xl shadow-blue-100 hover:bg-blue-700 transition-all active:scale-95">
-                               <Play className="w-5 h-5 fill-current" /> Prepare
+                            <button onClick={() => updateOrderStatus(order.id, 'preparing')} className="px-6 py-3 bg-blue-600 text-white rounded-2xl text-xs font-bold flex items-center gap-2 hover:bg-blue-700 transition-all">
+                              <Play className="w-4 h-4 fill-current" /> Prepare
                             </button>
                           )}
                           {order.order_status === 'preparing' && (
-                            <button onClick={() => updateOrderStatus(order.id, 'ready')} className="flex-1 flex items-center justify-center gap-3 px-8 py-4 bg-emerald-600 text-white rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-xl shadow-emerald-100 hover:bg-emerald-700 transition-all active:scale-95">
-                               <Check className="w-5 h-5" /> Mark Ready
+                            <button onClick={() => updateOrderStatus(order.id, 'ready')} className="px-6 py-3 bg-emerald-600 text-white rounded-2xl text-xs font-bold flex items-center gap-2 hover:bg-emerald-700 transition-all">
+                              <Check className="w-4 h-4" /> Mark Ready
                             </button>
                           )}
                           {order.order_status === 'ready' && (
-                            <button onClick={() => updateOrderStatus(order.id, 'delivered')} className="flex-1 flex items-center justify-center gap-3 px-8 py-4 bg-gray-950 text-white rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-2xl hover:bg-black transition-all active:scale-95">
-                               <Package className="w-5 h-5" /> Handover
+                            <button onClick={() => updateOrderStatus(order.id, 'delivered')} className="px-6 py-3 bg-slate-950 text-white rounded-2xl text-xs font-bold flex items-center gap-2 hover:bg-black transition-all">
+                              <Package className="w-4 h-4" /> Handover
                             </button>
                           )}
-                          {order.order_status === 'delivered' && (
-                            <div className="w-full flex items-center justify-center gap-3 px-8 py-4 bg-gray-50 text-gray-400 rounded-2xl text-[11px] font-black uppercase tracking-widest border border-gray-100">
-                               <CheckCircle2 className="w-5 h-5 text-emerald-500" /> Fulfilled
-                            </div>
-                          )}
-                       </div>
+                        </div>
+                      </div>
                     </div>
-                 </div>
-               ))
-             )}
-          </div>
-        )}
+                  ))
+                )}
+              </div>
+            </div>
+          )}
 
-        {activeTab === 'inventory' && (
-          <div className="space-y-8 animate-in slide-in-from-bottom-4 duration-500">
-             <div className="flex justify-between items-center bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm">
+          {activeTab === 'inventory' && (
+            <div className="space-y-6">
+              <div className="flex justify-between items-center bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200 dark:border-slate-800">
                 <div>
-                   <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Canteen Catalog Items</p>
-                   <p className="text-xl font-black text-gray-950">{filteredInventory.length} Active SKUs</p>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Catalog SKUs</p>
+                  <p className="text-lg font-black text-slate-900 dark:text-white">{filteredInventory.length} Items Listed</p>
                 </div>
-                <button onClick={() => setIsAddingItem(true)} className="flex items-center gap-2 px-8 py-4 bg-emerald-600 text-white rounded-[1.5rem] text-[11px] font-black uppercase tracking-widest shadow-xl shadow-emerald-100 active:scale-95 transition-all hover:bg-emerald-700">
-                   <Plus className="w-5 h-5" /> Create Item
+                <button onClick={() => setIsAddingItem(true)} className="flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white rounded-2xl text-xs font-bold hover:bg-emerald-700 transition-all">
+                  <Plus className="w-4 h-4" /> Add Item
                 </button>
-             </div>
+              </div>
 
-             <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredInventory.map(item => (
-                  <div key={item.id} className="bg-white p-6 rounded-[3rem] border border-gray-100 shadow-sm group hover:border-emerald-300 transition-all flex flex-col">
-                     <div className="flex gap-6 items-center">
-                        <div className="w-24 h-24 rounded-[2rem] overflow-hidden bg-gray-100 flex-shrink-0 relative shadow-inner">
-                           <img src={item.imageUrl} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                           {!item.availability && <div className="absolute inset-0 bg-gray-950/70 backdrop-blur-[2px] flex items-center justify-center text-[10px] text-white font-black uppercase tracking-widest">Off-Menu</div>}
+                  <div key={item.id} className="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+                    <div className="flex gap-4 items-center">
+                      <img src={item.imageUrl} className="w-20 h-20 rounded-2xl object-cover shrink-0" />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex justify-between items-start">
+                          <h4 className="font-bold text-slate-900 dark:text-white text-sm truncate">{item.item_name}</h4>
+                          <button onClick={() => deleteMenuItem(item.id)} className="text-slate-300 hover:text-red-500 p-1">
+                            <Trash2 className="w-4 h-4" />
+                          </button>
                         </div>
-                        <div className="flex-1 min-w-0">
-                           <div className="flex justify-between items-start mb-1">
-                              <h4 className="font-black text-gray-950 truncate text-lg">{item.item_name}</h4>
-                              <button onClick={() => deleteMenuItem(item.id)} className="text-gray-300 hover:text-red-500 transition-colors p-1">
-                                 <Trash2 className="w-4 h-4" />
-                              </button>
-                           </div>
-                           <p className="text-emerald-600 font-black text-2xl tracking-tighter">₹{item.price}</p>
-                           <span className="text-[9px] font-black text-gray-300 uppercase tracking-[0.3em]">{item.category}</span>
-                        </div>
-                     </div>
-                     
-                     <div className="mt-6 p-4 bg-gray-50 rounded-2xl flex items-center justify-between">
-                        <div className="flex gap-4">
-                           <div className="space-y-1">
-                              <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest">Counter</p>
-                              <p className="text-xs font-black text-gray-900">{item.stock_offline}</p>
-                           </div>
-                           <div className="w-px h-6 bg-gray-200 mt-1" />
-                           <div className="space-y-1">
-                              <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest">Online</p>
-                              <p className="text-xs font-black text-gray-900">{item.stock_online}</p>
-                           </div>
-                        </div>
-                        <div className="flex items-center gap-3">
-                           <span className={`text-[10px] font-black uppercase tracking-widest ${item.availability ? 'text-emerald-600' : 'text-gray-400'}`}>{item.availability ? 'Listed' : 'Unlisted'}</span>
-                           <button onClick={() => toggleAvailability(item.id)} className={`w-12 h-6 rounded-full relative transition-all ${item.availability ? 'bg-emerald-600' : 'bg-gray-300'}`}>
-                              <div className={`absolute top-1.5 w-3 h-3 bg-white rounded-full transition-all ${item.availability ? 'right-1.5' : 'left-1.5'}`} />
-                           </button>
-                        </div>
-                     </div>
+                        <p className="text-emerald-600 font-black text-xl">₹{item.price}</p>
+                        <span className="text-[10px] text-slate-400 font-bold uppercase">{item.category}</span>
+                      </div>
+                    </div>
+
+                    <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                      <div className="flex gap-4 text-xs font-bold text-slate-500">
+                        <span>Counter: {item.stock_offline}</span>
+                        <span>Online: {item.stock_online}</span>
+                      </div>
+                      <button onClick={() => toggleAvailability(item.id)} className={`px-3 py-1 rounded-full text-[10px] font-bold ${item.availability ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>
+                        {item.availability ? 'Available' : 'Disabled'}
+                      </button>
+                    </div>
                   </div>
                 ))}
-             </div>
+              </div>
+            </div>
+          )}
 
-             {/* Add Item Modal */}
-             {isAddingItem && (
-               <div className="fixed inset-0 bg-gray-950/80 backdrop-blur-md z-[100] flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
-                  <div className="bg-white w-full max-w-xl max-h-[90vh] overflow-y-auto no-scrollbar rounded-[2.5rem] p-6 sm:p-8 shadow-2xl animate-in zoom-in-95 duration-300 my-auto">
-                     <div className="flex justify-between items-center mb-10">
-                        <div className="space-y-1">
-                           <h3 className="text-3xl font-black text-gray-950">New Menu Entry</h3>
-                           <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Add item to catalog</p>
-                        </div>
-                        <button onClick={() => setIsAddingItem(false)} className="p-3 bg-gray-50 text-gray-400 hover:text-gray-950 rounded-2xl transition-all">
-                           <XIcon className="w-7 h-7" />
-                        </button>
-                     </div>
-                     <form onSubmit={handleAddItem} className="space-y-6">
-                        <div className="space-y-2">
-                           <label className="text-[11px] font-black text-gray-400 uppercase ml-2 tracking-widest">Item Designation</label>
-                           <input required value={newItem.item_name} onChange={e => setNewItem({...newItem, item_name: e.target.value})} className="w-full px-6 py-4 bg-gray-50 rounded-[1.5rem] outline-none font-bold text-gray-950 border-2 border-transparent focus:border-emerald-500 transition-all shadow-inner" placeholder="e.g. Traditional Paneer Butter Masala" />
-                        </div>
-                        
-                        <div className="space-y-2">
-                           <label className="text-[11px] font-black text-gray-400 uppercase ml-2 tracking-widest">Description</label>
-                           <textarea value={newItem.description || ''} onChange={e => setNewItem({...newItem, description: e.target.value})} className="w-full px-6 py-4 bg-gray-50 rounded-[1.5rem] outline-none font-bold text-gray-950 border-2 border-transparent focus:border-emerald-500 transition-all shadow-inner h-20 resize-none" placeholder="e.g. Rich, creamy paneer dish spiced with indian condiments." />
-                        </div>
+          {activeTab === 'reports' && <ReportsAnalysisView orders={orders} menu={menu} onNewWalkIn={() => navigateTo('walk-in-order')} />}
+          {activeTab === 'walk-in-order' && <WalkInOrderView user={user} menu={menu} onBack={goBack} onPlaceOrder={(o) => onUpdateOrders([o, ...orders])} />}
 
-                        <div className="space-y-2">
-                           <label className="text-[11px] font-black text-gray-400 uppercase ml-2 tracking-widest">Item Image URL</label>
-                           <input required type="url" value={newItem.imageUrl} onChange={e => setNewItem({...newItem, imageUrl: e.target.value})} className="w-full px-6 py-4 bg-gray-50 rounded-[1.5rem] outline-none font-bold text-gray-950 border-2 border-transparent focus:border-emerald-500 transition-all shadow-inner" placeholder="https://unsplash.com/..." />
-                           
-                           {/* Food Image Presets */}
-                           <div className="pt-2">
-                             <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2">Or Choose a Preset Dish Image:</p>
-                             <div className="flex flex-wrap gap-2">
-                               {[
-                                 { name: '🍗 Chicken Biryani', url: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&q=80&w=400', isVeg: false },
-                                 { name: '🍚 Chicken Fried Rice', url: 'https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&q=80&w=400', isVeg: false },
-                                 { name: '🥣 Curd Rice', url: 'https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&q=80&w=400', isVeg: true },
-                                 { name: '🍅 Tomato Rice', url: 'https://images.unsplash.com/photo-1596797038530-2c107229654b?auto=format&fit=crop&q=80&w=400', isVeg: true },
-                                 { name: '🥪 Chicken Sandwich', url: 'https://images.unsplash.com/photo-1521305916504-4a1121188589?auto=format&fit=crop&q=80&w=400', isVeg: false },
-                                 { name: '🍗 Chicken Nuggets', url: 'https://images.unsplash.com/photo-1562967914-608f82629710?auto=format&fit=crop&q=80&w=400', isVeg: false },
-                                 { name: '🔥 Chicken Wings', url: 'https://images.unsplash.com/photo-1567620832903-9fc6debc209f?auto=format&fit=crop&q=80&w=400', isVeg: false },
-                                 { name: '🥪 Veg Sandwich', url: 'https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&q=80&w=400', isVeg: true },
-                                 { name: '🍳 Breakfast', url: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&q=80&w=400', isVeg: true },
-                                 { name: '🍱 Thali/Lunch', url: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&q=80&w=400', isVeg: true },
-                                 { name: '🥤 Cold Coffee', url: 'https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?auto=format&fit=crop&q=80&w=400', isVeg: true },
-                                 { name: '🥟 Snacks', url: 'https://images.unsplash.com/photo-1601050690597-df056fb4ce78?auto=format&fit=crop&q=80&w=400', isVeg: true }
-                               ].map((preset, idx) => (
-                                 <button
-                                   key={idx}
-                                   type="button"
-                                   onClick={() => setNewItem({ ...newItem, imageUrl: preset.url, is_veg: preset.isVeg })}
-                                   className={`px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-wider transition-all border ${
-                                     newItem.imageUrl === preset.url
-                                       ? 'bg-emerald-600 border-emerald-600 text-white shadow-md shadow-emerald-100'
-                                       : 'bg-white border-gray-100 text-gray-500 hover:bg-gray-50'
-                                   }`}
-                                 >
-                                   {preset.name}
-                                 </button>
-                               ))}
-                             </div>
-                           </div>
-                        </div>
-                        <div className="grid grid-cols-3 gap-4">
-                           <div className="space-y-2">
-                              <label className="text-[11px] font-black text-gray-400 uppercase ml-2 tracking-widest">Pricing (₹)</label>
-                              <input required type="number" value={newItem.price} onChange={e => setNewItem({...newItem, price: Number(e.target.value)})} className="w-full px-6 py-4 bg-gray-50 rounded-[1.5rem] outline-none font-bold text-gray-950 border-2 border-transparent focus:border-emerald-500 transition-all shadow-inner" />
-                           </div>
-                           <div className="space-y-2">
-                              <label className="text-[11px] font-black text-gray-400 uppercase ml-2 tracking-widest">Dietary Type</label>
-                              <select value={newItem.is_veg ? 'veg' : 'non-veg'} onChange={e => setNewItem({...newItem, is_veg: e.target.value === 'veg'})} className="w-full px-4 py-4 bg-gray-50 rounded-[1.5rem] outline-none font-bold text-gray-950 border-2 border-transparent focus:border-emerald-500 transition-all shadow-inner appearance-none">
-                                 <option value="veg">🌱 Veg</option>
-                                 <option value="non-veg">🍖 Non-Veg</option>
-                              </select>
-                           </div>
-                           <div className="space-y-2">
-                              <label className="text-[11px] font-black text-gray-400 uppercase ml-2 tracking-widest">Classification</label>
-                              <select value={newItem.category} onChange={e => setNewItem({...newItem, category: e.target.value as any})} className="w-full px-4 py-4 bg-gray-50 rounded-[1.5rem] outline-none font-bold text-gray-950 border-2 border-transparent focus:border-emerald-500 transition-all shadow-inner appearance-none">
-                                 <option value="breakfast">Breakfast</option>
-                                 <option value="lunch">Lunch</option>
-                                 <option value="snacks">Snacks</option>
-                              </select>
-                           </div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                           <div className="space-y-2">
-                              <label className="text-[11px] font-black text-gray-400 uppercase ml-2 tracking-widest">Offline Stock</label>
-                              <input required type="number" value={newItem.stock_offline} onChange={e => setNewItem({...newItem, stock_offline: Number(e.target.value)})} className="w-full px-6 py-4 bg-gray-50 rounded-[1.5rem] outline-none font-bold text-gray-950 border-2 border-transparent focus:border-emerald-500 transition-all shadow-inner" />
-                           </div>
-                           <div className="space-y-2">
-                              <label className="text-[11px] font-black text-gray-400 uppercase ml-2 tracking-widest">Online Stock</label>
-                              <input required type="number" value={newItem.stock_online} onChange={e => setNewItem({...newItem, stock_online: Number(e.target.value)})} className="w-full px-6 py-4 bg-gray-50 rounded-[1.5rem] outline-none font-bold text-gray-950 border-2 border-transparent focus:border-emerald-500 transition-all shadow-inner" />
-                           </div>
-                        </div>
-                        <button type="submit" className="w-full py-5 bg-emerald-600 text-white font-black rounded-[2rem] shadow-[0_25px_50px_-12px_rgba(16,185,129,0.5)] mt-4 uppercase tracking-[0.2em] text-[12px] active:scale-[0.98] transition-all hover:bg-emerald-700">Save To Portal Catalog</button>
-                     </form>
+          {/* PORTAL SETUP / CONFIGURATION PAGE (MATCHING THE SCREENSHOT EXACTLY) */}
+          {activeTab === 'profile' && (
+            <div className="space-y-6 max-w-6xl mx-auto">
+              
+              {/* Top Row Cards: CANTEEN IDENTITY & HARDWARE BINDING */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                {/* CANTEEN IDENTITY Card */}
+                <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-6">
+                  <div className="flex items-center gap-3">
+                    <div className="p-3 bg-emerald-50 dark:bg-emerald-950 rounded-2xl text-emerald-600 dark:text-emerald-400">
+                      <Store className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className="font-extrabold text-sm uppercase tracking-wider text-slate-900 dark:text-white">CANTEEN IDENTITY</h3>
+                      <p className="text-xs text-slate-400 font-medium">Your outlet information and status</p>
+                    </div>
                   </div>
-               </div>
-             )}
-          </div>
-        )}
 
-        {activeTab === 'reports' && <ReportsAnalysisView orders={orders} menu={menu} onNewWalkIn={() => navigateTo('walk-in-order')} />}
-        {activeTab === 'walk-in-order' && <WalkInOrderView user={user} menu={menu} onBack={goBack} onPlaceOrder={(o) => onUpdateOrders([o, ...orders])} />}
-        
-        {activeTab === 'profile' && (
-          <div className="space-y-10 animate-in fade-in duration-500 max-w-5xl">
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="bg-white p-10 rounded-[3rem] border border-gray-100 shadow-sm space-y-8">
-                   <h3 className="text-sm font-black text-gray-400 uppercase tracking-widest flex items-center gap-3"><Store className="w-5 h-5 text-emerald-600"/> Canteen Identity</h3>
-                   <div className="space-y-6">
-                      <div className="flex gap-4">
-                         <div className="flex-1 space-y-2">
-                            <label className="text-[10px] font-black text-gray-400 uppercase ml-2 tracking-widest">Outlet Name</label>
-                            <input className="w-full px-5 py-4 bg-gray-50 rounded-2xl outline-none font-bold text-gray-900 shadow-inner" defaultValue={canteenProfile.canteen_name} />
-                         </div>
-                         <div className="w-36 space-y-2">
-                            <label className="text-[10px] font-black text-gray-400 uppercase ml-2 tracking-widest">System Status</label>
-                            <div className={`px-5 py-4 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] text-center shadow-inner ${canteenProfile.status === 'active' ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`}>
-                               {canteenProfile.status || 'Live'}
-                            </div>
-                         </div>
+                  <div className="space-y-4">
+                    <div className="flex gap-4">
+                      <div className="flex-1 space-y-1.5">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">OUTLET NAME</label>
+                        <input 
+                          defaultValue={canteenProfile?.canteen_name || "TimeToMeal Main Canteen"} 
+                          className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 rounded-2xl font-bold text-xs text-slate-900 dark:text-white border border-slate-100 dark:border-slate-700/50 outline-none" 
+                        />
                       </div>
-                      <div className="space-y-2">
-                         <label className="text-[10px] font-black text-gray-400 uppercase ml-2 tracking-widest">Primary Email</label>
-                         <input className="w-full px-5 py-4 bg-gray-50 rounded-2xl outline-none font-bold text-gray-900 shadow-inner" defaultValue={canteenProfile.email} readOnly />
-                      </div>
-                   </div>
-                </div>
-
-                <div className="bg-white p-10 rounded-[3rem] border border-gray-100 shadow-sm space-y-8">
-                   <h3 className="text-sm font-black text-gray-400 uppercase tracking-widest flex items-center gap-3"><Printer className="w-5 h-5 text-emerald-600"/> Hardware Binding</h3>
-                   <div className="space-y-6">
-                      <div className="space-y-2">
-                         <label className="text-[10px] font-black text-gray-400 uppercase ml-2 tracking-widest">Master Printer Device</label>
-                         <input className="w-full px-5 py-4 bg-gray-50 rounded-2xl outline-none font-bold text-gray-900 shadow-inner" placeholder="Searching for hardware..." defaultValue={canteenProfile.printer_settings?.printer_name} />
-                      </div>
-                      <div className="flex gap-4">
-                        <div className="flex-1 space-y-2">
-                            <label className="text-[10px] font-black text-gray-400 uppercase ml-2 tracking-widest">Paper Width</label>
-                            <input className="w-full px-5 py-4 bg-gray-50 rounded-2xl outline-none font-bold text-gray-900 shadow-inner" defaultValue="80mm Thermal" readOnly />
-                        </div>
-                        <div className="flex-1 space-y-2">
-                            <label className="text-[10px] font-black text-gray-400 uppercase ml-2 tracking-widest">Serial Com</label>
-                            <input className="w-full px-5 py-4 bg-gray-50 rounded-2xl outline-none font-bold text-gray-900 shadow-inner" defaultValue="COM4 Active" readOnly />
+                      <div className="w-32 space-y-1.5">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">SYSTEM STATUS</label>
+                        <div className="px-4 py-3 bg-emerald-50 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 rounded-2xl font-black text-xs text-center flex items-center justify-center gap-1.5">
+                          <span className="w-2 h-2 rounded-full bg-emerald-500"></span> ACTIVE
                         </div>
                       </div>
-                   </div>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">PRIMARY EMAIL</label>
+                      <div className="relative">
+                        <Mail className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
+                        <input 
+                          defaultValue={user.email} 
+                          readOnly 
+                          className="w-full pl-11 pr-4 py-3 bg-slate-50 dark:bg-slate-800 rounded-2xl font-bold text-xs text-slate-900 dark:text-white border border-slate-100 dark:border-slate-700/50 outline-none" 
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="md:col-span-2 bg-emerald-600 p-12 rounded-[4rem] flex flex-col items-center gap-6 text-center shadow-2xl shadow-emerald-200">
-                   <div className="w-20 h-20 bg-white/20 rounded-[2.5rem] flex items-center justify-center text-white backdrop-blur-xl">
+                {/* HARDWARE BINDING Card */}
+                <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-6">
+                  <div className="flex items-center gap-3">
+                    <div className="p-3 bg-emerald-50 dark:bg-emerald-950 rounded-2xl text-emerald-600 dark:text-emerald-400">
+                      <Printer className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className="font-extrabold text-sm uppercase tracking-wider text-slate-900 dark:text-white">HARDWARE BINDING</h3>
+                      <p className="text-xs text-slate-400 font-medium">Printer and hardware configuration</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">MASTER PRINTER DEVICE</label>
+                      <div className="relative">
+                        <Printer className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
+                        <input 
+                          defaultValue="Thermal BP-100" 
+                          className="w-full pl-11 pr-4 py-3 bg-slate-50 dark:bg-slate-800 rounded-2xl font-bold text-xs text-slate-900 dark:text-white border border-slate-100 dark:border-slate-700/50 outline-none" 
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">PAPER WIDTH</label>
+                        <div className="relative">
+                          <Edit2 className="w-3.5 h-3.5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
+                          <input 
+                            defaultValue="80mm Thermal" 
+                            readOnly 
+                            className="w-full pl-10 pr-3 py-3 bg-slate-50 dark:bg-slate-800 rounded-2xl font-bold text-xs text-slate-900 dark:text-white border border-slate-100 dark:border-slate-700/50 outline-none" 
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">SERIAL COM</label>
+                        <div className="relative flex items-center">
+                          <span className="w-2 h-2 rounded-full bg-emerald-500 absolute right-3 z-10"></span>
+                          <input 
+                            defaultValue="COM4 Active" 
+                            readOnly 
+                            className="w-full pl-4 pr-8 py-3 bg-slate-50 dark:bg-slate-800 rounded-2xl font-bold text-xs text-slate-900 dark:text-white border border-slate-100 dark:border-slate-700/50 outline-none" 
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Secure Management Session Hero Banner */}
+              <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#032B1E] via-[#043d2b] to-[#018855] p-8 text-white shadow-xl">
+                <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8">
+                  
+                  {/* Left Side Info */}
+                  <div className="flex items-start gap-6 max-w-xl">
+                    <div className="p-4 rounded-2xl bg-emerald-500/20 backdrop-blur-md border border-emerald-400/30 text-emerald-400 shrink-0">
                       <Shield className="w-10 h-10" />
-                   </div>
-                   <div>
-                      <h4 className="text-3xl font-black text-white leading-tight">Secure Management Session</h4>
-                      <p className="text-emerald-100 font-bold uppercase tracking-[0.4em] text-[10px] mt-2">Active Authorized User: {user.email}</p>
-                   </div>
-                   <button onClick={onLogout} className="px-12 py-5 bg-white text-emerald-700 font-black rounded-3xl shadow-2xl hover:bg-emerald-50 active:scale-95 transition-all uppercase tracking-[0.2em] text-[12px]">Terminate Access Session</button>
+                    </div>
+                    <div className="space-y-2">
+                      <h2 className="text-2xl font-black tracking-tight text-white">Secure Management Session</h2>
+                      <p className="text-xs text-emerald-100/80 font-medium">
+                        Your session is secure and all systems are operational.
+                      </p>
+
+                      <div className="pt-2">
+                        <p className="text-[10px] font-black text-emerald-300 uppercase tracking-widest mb-1.5">ACTIVE AUTHORIZED USER</p>
+                        <div className="inline-flex items-center gap-3 bg-[#032017]/80 border border-emerald-500/30 px-4 py-2 rounded-xl text-xs font-bold text-emerald-100">
+                          <UserIcon className="w-4 h-4 text-emerald-400" />
+                          <span>{user.email}</span>
+                          <span className="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 text-[9px] font-black uppercase">
+                            AUTHORIZED
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right Side Session Specs & Terminate Button */}
+                  <div className="flex flex-col items-end gap-6 w-full lg:w-auto border-t lg:border-t-0 lg:border-l border-emerald-500/20 pt-6 lg:pt-0 lg:pl-8">
+                    <div className="grid grid-cols-2 gap-x-8 gap-y-3 text-xs">
+                      <div>
+                        <p className="text-[10px] font-bold text-emerald-300/80">Session Security</p>
+                        <p className="font-extrabold text-white">Encrypted & Secure</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-bold text-emerald-300/80">System Access</p>
+                        <p className="font-extrabold text-white">Full Control</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-bold text-emerald-300/80">Last Login</p>
+                        <p className="font-extrabold text-white">Today, 10:24 AM</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-bold text-emerald-300/80">IP Address</p>
+                        <p className="font-extrabold text-white">192.168.1.105</p>
+                      </div>
+                    </div>
+
+                    <button 
+                      onClick={onLogout}
+                      className="px-6 py-3 rounded-xl bg-white text-[#032B1E] hover:bg-emerald-50 font-black text-xs uppercase tracking-wider shadow-lg flex items-center gap-2 transition-all active:scale-95"
+                    >
+                      <Lock className="w-4 h-4" /> TERMINATE ACCESS SESSION
+                    </button>
+                  </div>
+
                 </div>
-             </div>
-          </div>
-        )}
-      </main>
-      
-      <style>{`
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 8px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #e2e8f0;
-          border-radius: 20px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #cbd5e1;
-        }
-      `}</style>
+
+                {/* Decorative Background Shield Vector Graphics */}
+                <div className="absolute right-10 top-1/2 -translate-y-1/2 opacity-10 pointer-events-none hidden xl:block">
+                  <Shield className="w-72 h-72 text-emerald-300" />
+                </div>
+              </div>
+
+              {/* Bottom Stat Cards Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                
+                <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 flex items-center gap-4">
+                  <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400">
+                    <ShoppingCart className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase">Today's Orders</p>
+                    <p className="text-xl font-black text-slate-900 dark:text-white">128</p>
+                    <p className="text-[10px] font-bold text-emerald-600">+12% from yesterday</p>
+                  </div>
+                </div>
+
+                <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 flex items-center gap-4">
+                  <div className="p-3 rounded-xl bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400">
+                    <ClockIcon className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase">Live Queue</p>
+                    <p className="text-xl font-black text-slate-900 dark:text-white">18</p>
+                    <p className="text-[10px] font-bold text-blue-600">Active orders</p>
+                  </div>
+                </div>
+
+                <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 flex items-center gap-4">
+                  <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400">
+                    <BarChart3 className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase">Total Revenue</p>
+                    <p className="text-xl font-black text-slate-900 dark:text-white">₹12,450</p>
+                    <p className="text-[10px] font-bold text-emerald-600">Today</p>
+                  </div>
+                </div>
+
+                <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 flex items-center gap-4">
+                  <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400">
+                    <Printer className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase">Printer Status</p>
+                    <p className="text-xl font-black text-slate-900 dark:text-white">Online</p>
+                    <p className="text-[10px] font-bold text-emerald-600">Ready to print</p>
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+          )}
+
+        </main>
+      </div>
+
     </div>
   );
 };
 
-const Shield = ({className}: {className?: string}) => (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-);
-
 export default StaffView;
+
